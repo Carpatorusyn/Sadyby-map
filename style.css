@@ -17,7 +17,7 @@ body, html {
     z-index: 1;
 }
 
-/* --- Висувна панель --- */
+/* --- Висувна панель (ПК) --- */
 #sidebar {
     position: absolute;
     top: 0;
@@ -30,19 +30,44 @@ body, html {
     transition: transform 0.3s ease;
     display: flex;
     flex-direction: column;
+    padding-top: 40px; /* Місце для кнопки закриття */
 }
 
 #sidebar.hidden {
     transform: translateX(-100%);
 }
 
-/* --- Плаваючий пошук (як в Google Maps) --- */
+#close-sidebar {
+    position: absolute;
+    top: 50%;
+    right: -30px; 
+    transform: translateY(-50%);
+    background: white;
+    border: 1px solid #ccc;
+    border-left: none; 
+    border-radius: 0 8px 8px 0; 
+    width: 30px;
+    height: 60px;
+    font-size: 18px;
+    cursor: pointer;
+    color: #555;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#close-sidebar:hover {
+    background: #f1f2f6;
+}
+
+/* --- Плаваючий пошук (ПК) --- */
 #search-container {
     position: absolute;
     top: 20px;
-    left: 50%; /* Зсуваємо на середину */
-    transform: translateX(-50%); /* Точне центрування відносно власної ширини */
-    width: 350px;
+    left: 50%; 
+    transform: translateX(-50%); 
+    width: 450px; /* ЗМІНЕНО: Зробили пошук ширшим на ПК */
     z-index: 1001;
 }
 
@@ -60,7 +85,7 @@ body, html {
     list-style: none;
     background: white;
     border-radius: 0 0 8px 8px;
-    margin-top: -5px; /* Трохи ховаємо під інпут */
+    margin-top: -5px; 
     padding-top: 10px;
     max-height: 250px;
     overflow-y: auto;
@@ -81,36 +106,6 @@ body, html {
     background: #f1f2f6;
 }
 
-/* --- Оновлений Sidebar --- */
-#sidebar {
-    padding-top: 40px; /* Місце для кнопки закриття */
-    /* Інші стилі sidebar залишаються без змін */
-}
-
-#close-sidebar {
-    position: absolute;
-    top: 50%;
-    right: -30px; /* Висовуємо кнопку за межі панелі */
-    transform: translateY(-50%);
-    background: white;
-    border: 1px solid #ccc;
-    border-left: none; /* Щоб зливалося з панеллю */
-    border-radius: 0 8px 8px 0; /* Округлюємо лише праві кути */
-    width: 30px;
-    height: 60px;
-    font-size: 18px;
-    cursor: pointer;
-    color: #555;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#close-sidebar:hover {
-    background: #f1f2f6;
-}
-
 /* --- Сучасний повзунець прозорості --- */
 #opacity-control {
     position: absolute;
@@ -121,7 +116,7 @@ body, html {
     transform: translateX(-50%);
     background: white;
     padding: 12px 25px;
-    border-radius: 12px; /* ЗМІНЕНО: Прямокутник із загладженими кутами замість "пігулки" */
+    border-radius: 12px; 
     z-index: 1000;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
     display: flex;
@@ -133,15 +128,13 @@ body, html {
     color: #333;
 }
 
-/* Дизайн самої доріжки (шкали) */
 #opacity-slider {
     -webkit-appearance: none;
     appearance: none;
     width: 150px;
-    height: 14px; /* Зробили трохи товщим, щоб лінії було добре видно */
+    height: 14px; 
     border-radius: 6px;
     outline: none;
-    /* ЗМІНЕНО: Малюємо тонкі вертикальні лінії (шкалу) за допомогою градієнта */
     background: repeating-linear-gradient(
         to right,
         #f0f0f0,
@@ -149,51 +142,73 @@ body, html {
         #d1d1d1 10px,
         #d1d1d1 12px
     );
-    box-shadow: inset 0 1px 4px rgba(0,0,0,0.15); /* Ефект "вдавленості" доріжки */
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.15); 
     border: 1px solid #e0e0e0;
 }
 
-/* Дизайн рухомого об'єкта (бігунка) */
 #opacity-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 18px; /* ЗМІНЕНО: Прямокутна ширина */
-    height: 24px; /* ЗМІНЕНО: Прямокутна висота */
-    border-radius: 6px; /* Загладжені кути бігунка */
+    width: 18px; 
+    height: 24px; 
+    border-radius: 6px; 
     background: #3498db; 
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.4); /* Тінь для ефекту об'єму */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4); 
     transition: transform 0.1s ease, background 0.2s;
 }
 
-/* Ефект при наведенні мишки на бігунок */
 #opacity-slider::-webkit-slider-thumb:hover {
     transform: scale(1.1);
     background: #2980b9;
 }
 
-/* Ефект збільшення при наведенні */
-#opacity-slider::-webkit-slider-thumb:hover {
-    transform: scale(1.2);
-    /* --- Мобільна адаптація --- */
+
+/* ========================================= */
+/* --- Мобільна адаптація (Телефони) --- */
+/* ========================================= */
 @media (max-width: 768px) {
     
-    /* ... ваші попередні стилі для пошуку та панелі залишаються ... */
+    /* 1. Повертаємо нижню панель замість бокової */
+    #sidebar {
+        top: auto;
+        bottom: 0;
+        left: 0;
+        width: 100vw;
+        height: 50vh;
+        border-radius: 15px 15px 0 0;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+    }
 
-    /* Робимо повзунець та текст стовпчиком для мобільних */
+    #sidebar.hidden {
+        transform: translateY(100%);
+    }
+
+    /* Ховаємо "вушко" закриття, бо панель ховається кліком по карті */
+    #close-sidebar {
+        display: none;
+    }
+
+    /* 2. Компактний пошук (звільняємо правий кут для шарів) */
+    #search-container {
+        width: calc(100vw - 70px); /* Ширина на весь екран мінус 70px для кнопок */
+        left: 10px; 
+        top: 10px;
+        transform: none; /* Скасовуємо центрування */
+    }
+
+    /* 3. Повзунець стає стовпчиком */
     #opacity-control {
         bottom: 40px;
         flex-direction: column;
         padding: 10px 20px;
         gap: 10px;
-        border-radius: 12px; /* ЗМІНЕНО: Прямокутна форма із загладженими кутами для мобільного */
+        border-radius: 12px; 
     }
 
-    /* Змушуємо текст переноситися на новий рядок */
     #opacity-control label {
         text-align: center;
-        max-width: 100px; /* Обмежуємо ширину, щоб текст гарантовано розбився на 2 рядки */
+        max-width: 100px; 
         line-height: 1.2;
     }
-}
 }
