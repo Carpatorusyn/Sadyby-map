@@ -25,7 +25,7 @@ body, html {
     width: 350px;
     height: 100vh;
     background: white;
-    z-index: 1000;
+    z-index: 2000;
     box-shadow: 2px 0 10px rgba(0,0,0,0.2);
     transition: transform 0.3s ease;
     display: flex;
@@ -112,20 +112,82 @@ body, html {
 }
 
 /* --- Перенесений повзунець прозорості --- */
+/* --- Сучасний повзунець прозорості знизу --- */
+/* --- Сучасний повзунець прозорості знизу --- */
 #opacity-control {
     position: absolute;
-    top: 90px; /* Розміщуємо рівно під стандартним перемикачем шарів Leaflet */
-    right: 10px;
-    left: auto;
-    bottom: auto;
-    transform: none;
+    bottom: 30px; /* Відступ знизу */
+    top: auto;
+    left: 50%; /* Центруємо по горизонталі */
+    right: auto;
+    transform: translateX(-50%);
     background: white;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 12px 25px;
+    border-radius: 30px; /* Сильне заокруглення як у капсули */
     z-index: 1000;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.4); /* Стиль тіні як у кнопок Leaflet */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
     display: flex;
-    flex-direction: column; /* Робимо його компактнішим */
-    gap: 5px;
-    font-size: 12px;
+    flex-direction: row; /* Вишиковуємо в один рядок */
+    align-items: center;
+    gap: 15px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Прибираємо стандартний вигляд браузера */
+#opacity-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 150px;
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 5px;
+    outline: none;
+}
+
+/* Дизайн самої "кнопочки" (бігунка), за яку тягнуть */
+#opacity-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #3498db; /* Синій колір, можна змінити на ваш смак */
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    transition: transform 0.1s ease;
+}
+
+/* Ефект збільшення при наведенні */
+#opacity-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    /* --- Мобільна адаптація --- */
+@media (max-width: 768px) {
+    #sidebar {
+        top: auto;
+        bottom: 0;
+        left: 0;
+        width: 100vw;
+        height: 50vh;
+        border-radius: 15px 15px 0 0;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+    }
+
+    #sidebar.hidden {
+        transform: translateY(100%);
+    }
+
+    /* Зменшуємо та зсуваємо пошук, щоб не перекривав кнопки карти */
+    #search-container {
+        width: calc(100vw - 80px); /* Займає всю ширину мінус місце для кнопок справа */
+        left: 15px; 
+        transform: none; /* Відміняємо центрування, яке було на ПК */
+    }
+
+    /* Трохи підіймаємо повзунець, щоб він не прилипав до самого низу екрана телефону */
+    #opacity-control {
+        bottom: 40px;
+    }
+}
 }
