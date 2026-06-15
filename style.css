@@ -30,14 +30,14 @@ body, html {
     transition: transform 0.3s ease;
     display: flex;
     flex-direction: column;
-    padding-top: 40px; /* Місце для кнопки закриття */
 }
 
 #sidebar.hidden {
     transform: translateX(-100%);
 }
 
-#close-sidebar {
+/* Кнопка-перемикач (ПК) */
+#toggle-sidebar {
     position: absolute;
     top: 50%;
     right: -30px; 
@@ -55,10 +55,44 @@ body, html {
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 2001;
 }
 
-#close-sidebar:hover {
+#toggle-sidebar:hover {
     background: #f1f2f6;
+}
+
+/* Шапка садиби (синій фон) */
+.estate-header {
+    height: 20vh; /* Займає 20% висоти */
+    min-height: 120px;
+    background-color: #3498db; /* Тимчасовий синій колір */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: white;
+    text-align: center;
+}
+
+#estate-name {
+    margin: 0;
+    font-size: 24px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3); /* Легка тінь для читабельності */
+}
+
+/* Тіло панелі (відступи для тексту) */
+.estate-body {
+    padding: 25px; /* Відсуваємо текст від країв */
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+#estate-description {
+    color: #444;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    text-align: justify; /* Робимо текст рівним по обох краях */
 }
 
 /* --- Плаваючий пошук (ПК) --- */
@@ -185,8 +219,26 @@ body, html {
     }
 
     /* Ховаємо "вушко" закриття, бо панель ховається кліком по карті */
-    #close-sidebar {
-        display: none;
+   /* Адаптуємо шапку під округлі кути мобільної панелі */
+    .estate-header {
+        border-radius: 15px 15px 0 0;
+        height: 80px; 
+        min-height: auto;
+    }
+
+    /* Переносимо "язичок" наверх панелі */
+    #toggle-sidebar {
+        display: flex;
+        top: -30px; /* Висовуємо зверху */
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 30px;
+        border-radius: 15px 15px 0 0;
+        border: 1px solid #ccc;
+        border-bottom: none;
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
     }
 
     /* 2. Компактний пошук (звільняємо правий кут для шарів) */

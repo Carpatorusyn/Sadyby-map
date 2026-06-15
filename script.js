@@ -16,7 +16,7 @@ const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 });
 
 const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri'
+    attribution: 'Tiles © Esri'
 });
 
 // Додаємо звичайну карту за замовчуванням
@@ -50,20 +50,17 @@ opacitySlider.addEventListener('input', function (e) {
     historicalLayer.setOpacity(e.target.value);
 });
 
-// 6. Кастомна SVG іконка для садиб
+// 6. Кастомна SVG іконка для садиб (Суцільний білий будиночок з темним контуром)
 const customIcon = L.divIcon({
     className: 'custom-estate-icon',
-    html: `<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2c3e50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 21h18"></path>
-            <path d="M4 21V9l8-5 8 5v12"></path>
-            <path d="M9 21v-6h6v6"></path>
-            <path d="M14 10V8c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2"></path>
+    html: `<svg width="32" height="32" viewBox="0 0 24 24" fill="#ffffff" stroke="#2c3e50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
            </svg>`,
-    iconSize: [30, 30],
-    iconAnchor: [15, 30] // Вказуємо, що "низ" іконки - це точна координата
+    iconSize: [32, 32],
+    iconAnchor: [16, 32] // Вказуємо, що "низ" іконки - це точна координата
 });
 
-// 7. Тестові дані у форматі GeoJSON
 // 7. Реальні дані садиб у форматі GeoJSON
 const estatesGeoJSON = {
   "type": "FeatureCollection",
@@ -76,10 +73,7 @@ const estatesGeoJSON = {
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          32.778501,
-          51.0394368
-        ]
+        "coordinates": [32.778501, 51.0394368]
       }
     },
     {
@@ -90,10 +84,7 @@ const estatesGeoJSON = {
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          32.8377454,
-          50.7453933
-        ]
+        "coordinates": [32.8377454, 50.7453933]
       }
     },
     {
@@ -104,18 +95,19 @@ const estatesGeoJSON = {
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          31.5857958,
-          50.6801046
-        ]
+        "coordinates": [31.5857958, 50.6801046]
       }
     }
   ]
 };
 
+// ==========================================
 // 8. Логіка взаємодії з UI
+// ==========================================
+
+// Знаходимо всі необхідні елементи на сторінці
 const sidebar = document.getElementById('sidebar');
-const closeSidebarBtn = document.getElementById('close-sidebar');
+const toggleSidebarBtn = document.getElementById('toggle-sidebar');
 const estateNameEl = document.getElementById('estate-name');
 const estateDescEl = document.getElementById('estate-description');
 const estateRouteBtn = document.getElementById('estate-route');
@@ -124,31 +116,55 @@ const searchResults = document.getElementById('search-results');
 
 let markers = []; // Зберігаємо маркери для пошуку
 
-// Функція відкриття інформації про садибу
+// Функція для оновлення стрілочок на кнопці-перемикачі
+function updateToggleIcon() {
+    const isHidden = sidebar.classList.contains('hidden');
+    const isMobile = window.innerWidth <= 768;
+    
+    if (isMobile) {
+        toggleSidebarBtn.innerHTML = isHidden ? '▲' : '▼'; 
+    } else {
+        toggleSidebarBtn.innerHTML = isHidden ? '❯' : '❮'; 
+    }
+}
+
+// Клік по кнопці-перемикачу (відкрити/закрити панель)
+toggleSidebarBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('hidden');
+    updateToggleIcon();
+});
+
+// Слухаємо зміну розміру екрана (ПК/мобільний)
+window.addEventListener('resize', updateToggleIcon);
+updateToggleIcon();
+
+// Функція відкриття інформації про конкретну садибу
 function showEstateInfo(properties, coordinates) {
     estateNameEl.textContent = properties.name;
     estateDescEl.textContent = properties.description;
     
-    // Генеруємо посилання для Google Maps (lat, lng)
+    // Правильне посилання для побудови маршруту в Google Maps
     estateRouteBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${coordinates[1]},${coordinates[0]}`;
     estateRouteBtn.style.display = 'inline-block';
     
     sidebar.classList.remove('hidden');
-    searchResults.innerHTML = ''; // Очищаємо результати пошуку
-    searchInput.value = '';
+    updateToggleIcon(); 
+    searchResults.classList.add('hidden'); // Ховаємо список пошуку
+    searchInput.value = ''; // Очищаємо рядок пошуку
 }
 
-// Додаємо GeoJSON на карту
+// Додаємо садиби (GeoJSON) на карту
 L.geoJSON(estatesGeoJSON, {
     pointToLayer: function (feature, latlng) {
         const marker = L.marker(latlng, { icon: customIcon });
         
+        // Клік по маркеру садиби на карті
         marker.on('click', () => {
             showEstateInfo(feature.properties, feature.geometry.coordinates);
-            map.setView(latlng, 9, { animate: true, duration: 0.5 }); // Плавне зміщення за півсекунди
+            map.setView(latlng, 9, { animate: true, duration: 0.5 }); 
         });
         
-        // Додаємо дані в масив для пошуку
+        // Додаємо дані в масив для живого пошуку
         markers.push({
             name: feature.properties.name.toLowerCase(),
             feature: feature,
@@ -158,11 +174,6 @@ L.geoJSON(estatesGeoJSON, {
         return marker;
     }
 }).addTo(map);
-
-// Закриття панелі
-closeSidebarBtn.addEventListener('click', () => {
-    sidebar.classList.add('hidden');
-});
 
 // Живий пошук
 searchInput.addEventListener('input', function(e) {
@@ -188,16 +199,19 @@ searchInput.addEventListener('input', function(e) {
     filtered.forEach(item => {
         const li = document.createElement('li');
         li.textContent = item.feature.properties.name;
+        
+        // Клік по результату пошуку
         li.addEventListener('click', () => {
             showEstateInfo(item.feature.properties, item.feature.geometry.coordinates);
             map.setView(item.latlng, 9, { animate: true, duration: 0.5 });
-            searchResults.classList.add('hidden'); // Ховаємо результати після вибору
-            searchInput.value = item.feature.properties.name; // Записуємо назву в інпут
+            searchResults.classList.add('hidden');
+            searchInput.value = item.feature.properties.name; 
         });
         searchResults.appendChild(li);
     });
 });
-// Ховаємо повзунець, якщо історичний шар вимкнено
+
+// Керування відображенням повзунця прозорості
 const opacityControl = document.getElementById('opacity-control');
 
 map.on('overlayremove', function (e) {
@@ -208,11 +222,13 @@ map.on('overlayremove', function (e) {
 
 map.on('overlayadd', function (e) {
     if (e.name === "Історична карта") {
-        opacityControl.style.display = 'flex'; // Використовуємо flex, бо так задано у нашому CSS
+        opacityControl.style.display = 'flex'; 
     }
 });
-// Ховаємо результати пошуку та панель садиби, якщо клікнути десь на карті
+
+// Закриття панелі та пошуку при кліку на порожнє місце на карті
 map.on('click', () => {
     searchResults.classList.add('hidden');
-    sidebar.classList.add('hidden'); // Додано закриття лівої панелі
+    sidebar.classList.add('hidden'); 
+    updateToggleIcon(); 
 });
