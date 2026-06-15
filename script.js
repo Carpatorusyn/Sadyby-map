@@ -145,7 +145,7 @@ L.geoJSON(estatesGeoJSON, {
         
         marker.on('click', () => {
             showEstateInfo(feature.properties, feature.geometry.coordinates);
-            map.flyTo(latlng, 10); // Плавно наближаємо до садиби
+            map.setView(latlng, 9, { animate: true, duration: 0.5 }); // Плавне зміщення за півсекунди
         });
         
         // Додаємо дані в масив для пошуку
@@ -190,14 +190,27 @@ searchInput.addEventListener('input', function(e) {
         li.textContent = item.feature.properties.name;
         li.addEventListener('click', () => {
             showEstateInfo(item.feature.properties, item.feature.geometry.coordinates);
-            map.flyTo(item.latlng, 10);
+            map.setView(item.latlng, 9, { animate: true, duration: 0.5 });
             searchResults.classList.add('hidden'); // Ховаємо результати після вибору
             searchInput.value = item.feature.properties.name; // Записуємо назву в інпут
         });
         searchResults.appendChild(li);
     });
 });
+// Ховаємо повзунець, якщо історичний шар вимкнено
+const opacityControl = document.getElementById('opacity-control');
 
+map.on('overlayremove', function (e) {
+    if (e.name === "Історична карта") {
+        opacityControl.style.display = 'none';
+    }
+});
+
+map.on('overlayadd', function (e) {
+    if (e.name === "Історична карта") {
+        opacityControl.style.display = 'flex'; // Використовуємо flex, бо так задано у нашому CSS
+    }
+});
 // Ховаємо результати пошуку та панель садиби, якщо клікнути десь на карті
 map.on('click', () => {
     searchResults.classList.add('hidden');

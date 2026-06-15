@@ -111,23 +111,21 @@ body, html {
     background: #f1f2f6;
 }
 
-/* --- Перенесений повзунець прозорості --- */
-/* --- Сучасний повзунець прозорості знизу --- */
-/* --- Сучасний повзунець прозорості знизу --- */
+/* --- Сучасний повзунець прозорості --- */
 #opacity-control {
     position: absolute;
-    bottom: 30px; /* Відступ знизу */
+    bottom: 30px;
     top: auto;
-    left: 50%; /* Центруємо по горизонталі */
+    left: 50%;
     right: auto;
     transform: translateX(-50%);
     background: white;
     padding: 12px 25px;
-    border-radius: 30px; /* Сильне заокруглення як у капсули */
+    border-radius: 12px; /* ЗМІНЕНО: Прямокутник із загладженими кутами замість "пігулки" */
     z-index: 1000;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
     display: flex;
-    flex-direction: row; /* Вишиковуємо в один рядок */
+    flex-direction: row;
     align-items: center;
     gap: 15px;
     font-size: 14px;
@@ -135,28 +133,43 @@ body, html {
     color: #333;
 }
 
-/* Прибираємо стандартний вигляд браузера */
+/* Дизайн самої доріжки (шкали) */
 #opacity-slider {
     -webkit-appearance: none;
     appearance: none;
     width: 150px;
-    height: 6px;
-    background: #e0e0e0;
-    border-radius: 5px;
+    height: 14px; /* Зробили трохи товщим, щоб лінії було добре видно */
+    border-radius: 6px;
     outline: none;
+    /* ЗМІНЕНО: Малюємо тонкі вертикальні лінії (шкалу) за допомогою градієнта */
+    background: repeating-linear-gradient(
+        to right,
+        #f0f0f0,
+        #f0f0f0 10px,
+        #d1d1d1 10px,
+        #d1d1d1 12px
+    );
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.15); /* Ефект "вдавленості" доріжки */
+    border: 1px solid #e0e0e0;
 }
 
-/* Дизайн самої "кнопочки" (бігунка), за яку тягнуть */
+/* Дизайн рухомого об'єкта (бігунка) */
 #opacity-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #3498db; /* Синій колір, можна змінити на ваш смак */
+    width: 18px; /* ЗМІНЕНО: Прямокутна ширина */
+    height: 24px; /* ЗМІНЕНО: Прямокутна висота */
+    border-radius: 6px; /* Загладжені кути бігунка */
+    background: #3498db; 
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-    transition: transform 0.1s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4); /* Тінь для ефекту об'єму */
+    transition: transform 0.1s ease, background 0.2s;
+}
+
+/* Ефект при наведенні мишки на бігунок */
+#opacity-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    background: #2980b9;
 }
 
 /* Ефект збільшення при наведенні */
@@ -170,10 +183,10 @@ body, html {
     /* Робимо повзунець та текст стовпчиком для мобільних */
     #opacity-control {
         bottom: 40px;
-        flex-direction: column; /* ЗМІНЕНО: тепер текст і повзунець один під одним */
+        flex-direction: column;
         padding: 10px 20px;
-        gap: 8px; /* Зменшуємо проміжок */
-        border-radius: 15px; /* Робимо краї менш круглими для стовпчика */
+        gap: 10px;
+        border-radius: 12px; /* ЗМІНЕНО: Прямокутна форма із загладженими кутами для мобільного */
     }
 
     /* Змушуємо текст переноситися на новий рядок */
