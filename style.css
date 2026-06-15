@@ -164,30 +164,20 @@ body, html {
     transform: scale(1.2);
     /* --- Мобільна адаптація --- */
 @media (max-width: 768px) {
-    #sidebar {
-        top: auto;
-        bottom: 0;
-        left: 0;
-        width: 100vw;
-        height: 50vh;
-        border-radius: 15px 15px 0 0;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
-    }
+    
+    /* ... тут залишаються ваші попередні стилі для #sidebar, #search-container та #opacity-control ... */
 
-    #sidebar.hidden {
-        transform: translateY(100%);
+    /* Зсуваємо кнопки масштабу (+/-) та перемикач шарів Leaflet нижче рядка пошуку */
+    .leaflet-top .leaflet-control {
+        margin-top: 80px !important; /* Робимо відступ зверху, щоб звільнити місце для пошуку */
     }
-
-    /* Зменшуємо та зсуваємо пошук, щоб не перекривав кнопки карти */
-    #search-container {
-        width: calc(100vw - 80px); /* Займає всю ширину мінус місце для кнопок справа */
-        left: 15px; 
-        transform: none; /* Відміняємо центрування, яке було на ПК */
+    
+    /* Якщо кнопки наближення та шарів заважають одна одній, можна рознести їх за допомогою цього правила: */
+    .leaflet-top.leaflet-right {
+        margin-top: 80px !important;
     }
-
-    /* Трохи підіймаємо повзунець, щоб він не прилипав до самого низу екрана телефону */
-    #opacity-control {
-        bottom: 40px;
+    .leaflet-top.leaflet-left {
+        margin-top: 80px !important;
     }
 }
 }
