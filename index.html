@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карта історичних садиб</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="search-container">
+        <input type="text" id="search-input" placeholder="Пошук садиби...">
+        <ul id="search-results" class="hidden"></ul>
+    </div>
+
+    <div id="sidebar" class="hidden">
+        <button id="close-sidebar">×</button>
+        <div id="estate-info">
+            <h2 id="estate-name">Оберіть садибу</h2>
+            <p id="estate-description">Натисніть на маркер на карті або скористайтеся пошуком, щоб побачити детальну інформацію.</p>
+            <a id="estate-route" href="#" target="_blank" style="display: none;" class="btn-route">Прокласти маршрут</a>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <div id="opacity-control" class="leaflet-bar">
+        <label for="opacity-slider">Прозорість іст. карти:</label>
+        <input type="range" id="opacity-slider" min="0" max="1" step="0.1" value="1">
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
