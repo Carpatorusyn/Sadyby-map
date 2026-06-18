@@ -110,20 +110,24 @@ const sidebar = document.getElementById('sidebar');
 const toggleSidebarBtn = document.getElementById('toggle-sidebar');
 const estateNameEl = document.getElementById('estate-name');
 const estateDescEl = document.getElementById('estate-description');
-const estateRouteBtn = document.getElementById('estate-route');
+const estateCoordinatesContainer = document.getElementById('estate-coordinates');
+const coordTextEl = document.getElementById('coord-text');
+const btnTerminology = document.getElementById('btn-terminology');
 const searchInput = document.getElementById('search-input');
 const searchResults = document.getElementById('search-results');
+// Елементи модального вікна
+const terminologyModal = document.getElementById('terminology-modal');
+const closeModalBtn = document.querySelector('.modal-close-btn');
+
 
 let markers = []; // Зберігаємо маркери для пошуку
 
 // Функція для оновлення стрілочок на кнопці-перемикачі
 function updateToggleIcon() {
     const isHidden = sidebar.classList.contains('hidden');
-    const isMobile = window.innerWidth <= 768;
-    
-    if (isMobile) {
-        toggleSidebarBtn.innerHTML = isHidden ? '▲' : '▼'; 
-    } else {
+    // Мобільна версія тепер має статичний CSS-індикатор,
+    // тому оновлюємо іконку тільки для ПК.
+    if (window.innerWidth > 768) {
         toggleSidebarBtn.innerHTML = isHidden ? '❯' : '❮'; 
     }
 }
@@ -142,13 +146,19 @@ updateToggleIcon();
 function showEstateInfo(properties, coordinates) {
     estateNameEl.textContent = properties.name;
     estateDescEl.textContent = properties.description;
-    
-    // Правильне посилання для побудови маршруту в Google Maps
-    estateRouteBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${coordinates[1]},${coordinates[0]}`;
-    estateRouteBtn.style.display = 'inline-block';
+
+    const lat = coordinates[1];
+    const lng = coordinates[0];
+
+    // Форматуємо координати (Широта, Довгота) і показуємо їх
+    // Leaflet використовує [Довгота, Широта] у GeoJSON, тому міняємо місцями для Google Maps формату
+    coordTextEl.textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    estateCoordinatesContainer.classList.remove('hidden');
+    // Зберігаємо посилання на Google Maps у data-атрибуті
+    estateCoordinatesContainer.dataset.url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
     
     sidebar.classList.remove('hidden');
-    updateToggleIcon(); 
+    updateToggleIcon();
     searchResults.classList.add('hidden'); // Ховаємо список пошуку
     searchInput.value = ''; // Очищаємо рядок пошуку
 }
@@ -231,4 +241,31 @@ map.on('click', () => {
     searchResults.classList.add('hidden');
     sidebar.classList.add('hidden'); 
     updateToggleIcon(); 
+});
+
+// Клік по блоку з координатами для відкриття карти
+estateCoordinatesContainer.addEventListener('click', () => {
+    const url = estateCoordinatesContainer.dataset.url;
+    if (url) {
+        window.open(url, '_blank');
+    }
+});
+
+// Слухач події для нової кнопки Термінологія
+function showModal() {
+    terminologyModal.classList.remove('hidden');
+}
+
+function hideModal() {
+    terminologyModal.classList.add('hidden');
+}
+
+btnTerminology.addEventListener('click', showModal);
+closeModalBtn.addEventListener('click', hideModal);
+
+// Закриття модального вікна при кліку на фон
+terminologyModal.addEventListener('click', (e) => {
+    if (e.target === terminologyModal) {
+        hideModal();
+    }
 });
