@@ -19,43 +19,57 @@ body, html {
 
 /* --- Висувна панель (ПК) --- */
 #sidebar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 350px;
-    height: 100vh;
+    position: fixed; /* Змінено для "плаваючого" ефекту */
+    top: 20px;
+    left: 20px;
+    width: 400px; /* Розширено, як ви просили */
+    height: calc(100vh - 40px); /* Відступи зверху і знизу */
     background: white;
     z-index: 2000;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.2);
-    transition: transform 0.3s ease;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2); /* Тінь як у модального вікна */
+    border-radius: 12px; /* Згладжені кути */
+    transition: transform 0.3s ease, opacity 0.3s ease;
     display: flex;
     flex-direction: column;
+    opacity: 1;
 }
 
 #sidebar.hidden {
-    transform: translateX(-100%);
+    transform: translateX(calc(-100% - 20px)); /* Ховаємо за межі екрану */
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* Кнопка-перемикач (ПК) */
+/* Оновлено: Уніфікований дизайн для ПК та мобільних */
 #toggle-sidebar {
     position: absolute;
     top: 50%;
-    right: -30px; 
+    right: -30px; /* Змінено позицію */
     transform: translateY(-50%);
     background: white;
     border: 1px solid #ccc;
-    border-left: none; 
-    border-radius: 0 8px 8px 0; 
-    width: 30px;
-    height: 60px;
-    font-size: 18px;
+    border-left: none;
+    border-radius: 0 10px 10px 0;
+    width: 30px; /* Зроблено вужчим */
+    height: 70px; /* Зроблено коротшим */
     cursor: pointer;
-    color: #555;
     box-shadow: 2px 0 5px rgba(0,0,0,0.2);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 2001;
+    transition: background-color 0.2s ease;
+}
+
+/* Малюємо риску всередині кнопки */
+#toggle-sidebar::after {
+    content: '';
+    width: 5px; /* Ширина риски */
+    height: 30px; /* Довжина риски */
+    background-color: #b0bec5; /* Колір риски */
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
 }
 
 #toggle-sidebar:hover {
@@ -66,7 +80,8 @@ body, html {
 .estate-header {
     height: 20vh; /* Займає 20% висоти */
     min-height: 120px;
-    background-color: #3498db; /* Тимчасовий синій колір */
+    background-color: #3498db;
+    border-radius: 12px 12px 0 0; /* Адаптуємо кути під новий дизайн */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -79,6 +94,27 @@ body, html {
     margin: 0;
     font-size: 24px;
     text-shadow: 0 2px 4px rgba(0,0,0,0.3); /* Легка тінь для читабельності */
+}
+
+/* Кнопка закриття панелі на мобільних */
+#sidebar-close-btn {
+    display: none; /* Приховано на ПК */
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 32px;
+    font-weight: 300;
+    color: white;
+    cursor: pointer;
+    z-index: 2002;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s;
+}
+
+#sidebar-close-btn:hover {
+    transform: scale(1.1);
 }
 
 /* Тіло панелі (відступи для тексту) */
@@ -256,66 +292,63 @@ body, html {
 @media (max-width: 768px) {
     
     /* 1. Повертаємо нижню панель замість бокової */
+    /* ОНОВЛЕНО: Панель тепер є модальним вікном по центру */
     #sidebar {
-        top: auto;
-        bottom: 0;
-        left: 0;
-        width: 100vw;
-        height: 50vh;
-        border-radius: 15px 15px 0 0;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(1);
+        width: 95vw; /* Збільшено ширину */
+        max-width: 500px;
+        height: auto;
+        max-height: 85vh; /* Збільшено висоту */
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.25);
     }
 
     #sidebar.hidden {
-        transform: translateY(100%);
+        transform: translate(-50%, -50%) scale(0.9);
+        opacity: 0;
+        pointer-events: none;
     }
 
-    /* Ховаємо "вушко" закриття, бо панель ховається кліком по карті */
-   /* Адаптуємо шапку під округлі кути мобільної панелі */
+    /* Адаптуємо шапку під округлі кути мобільної панелі */
     .estate-header {
-        border-radius: 15px 15px 0 0;
+        border-radius: 12px 12px 0 0;
         height: 80px; 
         min-height: auto;
     }
 
-    /* Переносимо "язичок" наверх панелі */
-    /* Оновлено: перетворюємо на сучасний повзунок */
+    /* Ховаємо кнопку-перемикач на мобільних, бо панель тепер модальна */
     #toggle-sidebar {
-        top: -20px; /* Розміщуємо трохи вище панелі */
-        left: 50%;
-        right: auto;
-        transform: translateX(-50%);
-        width: 120px; /* Збільшуємо область для дотику */
-        height: 20px; /* Робимо її низькою */
-        background: transparent; /* Кнопка сама по собі невидима */
-        border: none;
-        box-shadow: none;
-        border-radius: 0;
+        display: none;
     }
 
-    /* Малюємо сам індикатор-повзунок */
-    #toggle-sidebar::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 40px; /* Ширина рисочки */
-        height: 5px; /* Товщина рисочки */
-        background-color: #c8d6e5; /* Колір індикатора */
-        border-radius: 3px;
+    /* Показуємо кнопку закриття на мобільних */
+    #sidebar-close-btn {
+        display: block;
     }
+
     /* 2. Компактний пошук (звільняємо правий кут для шарів) */
+    /* Адаптація під "чолку" на iPhone */
     #search-container {
-        width: calc(100vw - 70px); /* Ширина на весь екран мінус 70px для кнопок */
-        left: 10px; 
-        top: 10px;
+        /* Відступи від країв + урахування безпечних зон */
+        left: calc(env(safe-area-inset-left, 0px) + 10px); 
+        top: calc(env(safe-area-inset-top, 0px) + 10px);
+        width: calc(100vw - (env(safe-area-inset-left, 0px) + 10px) - (env(safe-area-inset-right, 0px) + 70px));
         transform: none; /* Скасовуємо центрування */
     }
 
+    /* Адаптація контролу шарів під "чолку" */
+    .leaflet-top.leaflet-right {
+        top: calc(env(safe-area-inset-top, 0px) + 10px);
+        right: calc(env(safe-area-inset-right, 0px) + 10px);
+    }
+
     /* 3. Повзунець стає стовпчиком */
+    /* Адаптація під нижню безпечну зону на iPhone */
     #opacity-control {
-        bottom: 40px;
+        /* Відступ знизу + урахування безпечної зони */
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
         flex-direction: column;
         padding: 10px 20px;
         gap: 10px;

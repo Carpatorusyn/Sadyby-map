@@ -113,6 +113,7 @@ const estateDescEl = document.getElementById('estate-description');
 const estateCoordinatesContainer = document.getElementById('estate-coordinates');
 const coordTextEl = document.getElementById('coord-text');
 const btnTerminology = document.getElementById('btn-terminology');
+const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
 const searchInput = document.getElementById('search-input');
 const searchResults = document.getElementById('search-results');
 // Елементи модального вікна
@@ -124,12 +125,9 @@ let markers = []; // Зберігаємо маркери для пошуку
 
 // Функція для оновлення стрілочок на кнопці-перемикачі
 function updateToggleIcon() {
-    const isHidden = sidebar.classList.contains('hidden');
-    // Мобільна версія тепер має статичний CSS-індикатор,
-    // тому оновлюємо іконку тільки для ПК.
-    if (window.innerWidth > 768) {
-        toggleSidebarBtn.innerHTML = isHidden ? '❯' : '❮'; 
-    }
+    // Ця функція більше не змінює іконку, оскільки тепер використовується
+    // уніфікований CSS-дизайн. Залишаємо її на випадок, якщо знадобиться
+    // інша логіка при зміні розміру вікна.
 }
 
 // Клік по кнопці-перемикачу (відкрити/закрити панель)
@@ -249,6 +247,11 @@ estateCoordinatesContainer.addEventListener('click', () => {
     if (url) {
         window.open(url, '_blank');
     }
+});
+
+// Закриття мобільної панелі по кнопці-хрестику
+sidebarCloseBtn.addEventListener('click', () => {
+    sidebar.classList.add('hidden');
 });
 
 // Слухач події для нової кнопки Термінологія
