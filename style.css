@@ -8,6 +8,7 @@
 body, html {
     height: 100vh;
     width: 100vw;
+    background: #000; /* Робимо фон чорним, щоб "чілка" на iPhone не була білою */
     overflow: hidden;
 }
 
@@ -183,6 +184,79 @@ body, html {
     transform: translateY(-1px);
 }
 
+/* --- Кастомна кнопка шарів (глобальні стилі) --- */
+
+/* Повністю ховаємо оригінальну іконку Leaflet, але залишаємо її контейнер */
+.leaflet-control-layers-toggle {
+    display: none !important;
+}
+
+/* Наша нова кнопка */
+#custom-layers-btn {
+    display: flex !important; /* !important потрібен, щоб перевизначити вбудований стиль display:none */
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 20px; /* Позиція для ПК */
+    right: 20px; /* Позиція для ПК */
+    width: 44px;
+    height: 44px;
+    background: white;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    cursor: pointer;
+    z-index: 1002;
+}
+
+/* Позиціонуємо саму панель, яка тепер відкривається нашим JS */
+.leaflet-control-layers.leaflet-control-layers-expanded {
+    /* Перетворюємо стандартний контрол на наше випадаюче меню */
+    position: absolute;
+    top: calc(20px + 44px + 8px); /* Позиція для ПК: Відступ + висота кнопки + відступ */
+    right: 20px; /* Позиція для ПК */
+    background: white;
+    min-width: 200px; /* Мінімальна ширина, щоб не було занадто вузько */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+    padding: 12px; /* Збільшимо внутрішні відступи */
+    /* Скидаємо стандартні стилі Leaflet */
+    border: none;
+}
+
+/* Стилізація самого списку шарів всередині панелі */
+.leaflet-control-layers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Відступ між елементами */
+}
+
+.leaflet-control-layers-list label {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Відступ між радіо/чекбоксом та текстом */
+    font-size: 16px; /* Збільшимо шрифт */
+    cursor: pointer;
+    padding: 8px 10px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.leaflet-control-layers-list label:hover {
+    background-color: #f1f2f6;
+}
+
+.leaflet-control-layers-separator {
+    margin: 5px 0 !important; /* Перевизначаємо стандартний негативний відступ Leaflet */
+}
+
+/* Ховаємо стандартний контейнер Leaflet, коли він не розкритий */
+.leaflet-control-layers:not(.leaflet-control-layers-expanded) {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
 /* --- Плаваючий пошук (ПК) --- */
 #search-container {
     position: absolute;
@@ -231,11 +305,11 @@ body, html {
 /* --- Сучасний повзунець прозорості --- */
 #opacity-control {
     position: absolute;
-    bottom: 30px;
+    bottom: 20px; /* Змінено для вирівнювання з кнопками зуму */
     top: auto;
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
+    left: 50%; /* Центруємо по горизонталі */
+    right: auto; /* Прибираємо позиціонування справа */
+    transform: translateX(-50%); /* Компенсуємо ширину елемента для точного центрування */
     background: white;
     padding: 12px 25px;
     border-radius: 12px; 
@@ -300,7 +374,7 @@ body, html {
         width: 95vw; /* Збільшено ширину */
         max-width: 500px;
         height: auto;
-        max-height: 85vh; /* Збільшено висоту */
+        max-height: 80vh; /* Зменшено висоту для створення проміжку зверху */
         border-radius: 12px;
         box-shadow: 0 5px 20px rgba(0,0,0,0.25);
     }
@@ -332,23 +406,32 @@ body, html {
     /* Адаптація під "чолку" на iPhone */
     #search-container {
         /* Відступи від країв + урахування безпечних зон */
-        left: calc(env(safe-area-inset-left, 0px) + 10px); 
-        top: calc(env(safe-area-inset-top, 0px) + 10px);
+        left: calc(env(safe-area-inset-left, 0px) + 10px);
+        /* Опущено трохи нижче для вирівнювання з кнопкою шарів */
+        top: calc(env(safe-area-inset-top, 0px) + 12px);
         width: calc(100vw - (env(safe-area-inset-left, 0px) + 10px) - (env(safe-area-inset-right, 0px) + 70px));
         transform: none; /* Скасовуємо центрування */
     }
 
-    /* Адаптація контролу шарів під "чолку" */
-    .leaflet-top.leaflet-right {
-        top: calc(env(safe-area-inset-top, 0px) + 10px);
+    /* Адаптуємо позицію кастомної кнопки для мобільних */
+    #custom-layers-btn {
+        top: calc(env(safe-area-inset-top, 0px) + 12px);
+        right: calc(env(safe-area-inset-right, 0px) + 10px);
+    }
+
+    /* Адаптуємо позицію панелі шарів для мобільних */
+    .leaflet-control-layers.leaflet-control-layers-expanded {
+        top: calc(env(safe-area-inset-top, 0px) + 12px + 44px + 8px); /* Відступ + висота кнопки + відступ */
         right: calc(env(safe-area-inset-right, 0px) + 10px);
     }
 
     /* 3. Повзунець стає стовпчиком */
     /* Адаптація під нижню безпечну зону на iPhone */
     #opacity-control {
-        /* Відступ знизу + урахування безпечної зони */
-        bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); /* Тримаємо на одному рівні з кнопками зуму */
+        left: 50%; /* Повертаємо центрування */
+        right: auto; /* Скасовуємо жорстку прив'язку до правого краю */
+        transform: translateX(-50%); /* Ідеальне вирівнювання строго по центру */
         flex-direction: column;
         padding: 10px 20px;
         gap: 10px;
@@ -357,8 +440,13 @@ body, html {
 
     #opacity-control label {
         text-align: center;
-        max-width: 100px; 
         line-height: 1.2;
+    }
+
+    /* Адаптація контролів у нижньому правому куті (кнопки зуму) */
+    .leaflet-bottom.leaflet-right {
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+        right: calc(env(safe-area-inset-right, 0px) + 10px);
     }
 }
 
