@@ -664,7 +664,7 @@ const estatesGeoJSON = {
 
 // Знаходимо всі необхідні елементи на сторінці
 const sidebar = document.getElementById('sidebar');
-const toggleSidebarBtn = document.getElementById('toggle-sidebar');
+// const toggleSidebarBtn = document.getElementById('toggle-sidebar');
 const estateNameEl = document.getElementById('estate-name');
 const estateDescEl = document.getElementById('estate-description');
 const estateCoordinatesContainer = document.getElementById('estate-coordinates');
@@ -693,15 +693,15 @@ function updateToggleIcon() {
 }
 
 // Клік по кнопці-перемикачу (відкрити/закрити панель)
-toggleSidebarBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('hidden');
-    if (sidebar.classList.contains('hidden') && selectedMarker) {
-        selectedMarker.setIcon(customIcon);
-        selectedMarker = null;
-        resetMapView(); // НОВЕ: повертаємо зум та координати
-    }
-    updateToggleIcon();
-});
+// toggleSidebarBtn.addEventListener('click', () => {
+//     sidebar.classList.toggle('hidden');
+//     if (sidebar.classList.contains('hidden') && selectedMarker) {
+//         selectedMarker.setIcon(customIcon);
+//         selectedMarker = null;
+//         resetMapView(); // НОВЕ: повертаємо зум та координати
+//     }
+//     updateToggleIcon();
+// });
 
 // Слухаємо зміну розміру екрана (ПК/мобільний)
 window.addEventListener('resize', updateToggleIcon);

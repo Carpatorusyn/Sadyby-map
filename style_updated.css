@@ -1,3 +1,14 @@
+:root {
+    /* Підсвічений чорний (темно-сірий) з прозорістю 75% */
+    --glass-bg: rgba(25, 25, 30, 0.75); 
+    /* Сильне розмиття того, що під панеллю */
+    --glass-blur: blur(16px) saturate(120%);
+    /* Тонка напівпрозора біла рамка по контуру */
+    --glass-border: 1px solid rgba(255, 255, 255, 0.15);
+    /* Білий текст */
+    --text-light: #f5f5f7; 
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -23,15 +34,20 @@ body, html {
     position: fixed; /* Змінено для "плаваючого" ефекту */
     top: 20px;
     left: 20px;
-    width: 400px; /* Розширено, як ви просили */
+    width: 440px; /* Збільшили з 400px до 440px для більшого простору тексту */
     height: calc(100vh - 40px); /* Відступи зверху і знизу */
-    background: white;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-right: var(--glass-border);
+    color: var(--text-light);
     z-index: 2000;
     box-shadow: 0 5px 20px rgba(0,0,0,0.2); /* Тінь як у модального вікна */
     border-radius: 12px; /* Згладжені кути */
     transition: transform 0.3s ease, opacity 0.3s ease;
     display: flex;
     flex-direction: column;
+    overflow: hidden; /* Гарантує, що нічого всередині не вилізе за заокруглені кути панелі */
     opacity: 1;
 }
 
@@ -77,45 +93,73 @@ body, html {
     background: #f1f2f6;
 }
 
-/* Шапка садиби (синій фон) */
-.estate-header {
-    height: 20vh; /* Займає 20% висоти */
-    min-height: 120px;
-    background-color: #3498db;
-    border-radius: 12px 12px 0 0; /* Адаптуємо кути під новий дизайн */
+/* Оновлений блок шапки садиби з фоном */
+.sidebar-header, .estate-header { 
+    position: relative;
+    /* Збільшуємо висоту блоку (можеш гратися з цифрою 50px, якщо треба ще вище) */
+    padding: 50px 20px; 
+    
+    /* Центруємо елементи по вертикалі та горизонталі */
     display: flex;
-    align-items: center;
     justify-content: center;
-    padding: 20px;
-    color: white;
+    align-items: center;
     text-align: center;
+    
+    /* Окремо прописуємо фон, щоб уникнути багів з "полосками" */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.85)), url('background_name.jpg');
+    background-size: cover !important; 
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    
+    /* Прибираємо тонку лінію знизу, яка давала артефакт */
+    border-bottom: none; 
+    
+    /* Додаємо внутрішню тінь знизу, щоб картинка плавно "розчинялася" в інтерфейсі панелі */
+    box-shadow: inset 0 -10px 20px rgba(0,0,0,0.4);
 }
 
-#estate-name {
+/* Оновлений текст назви садиби з адаптивним розміром */
+.sidebar-header h2, .estate-header h2 {
+    color: #ffffff !important;
+    
+    /* МАГІЯ ТУТ: мінімум 18px (для найменших телефонів), гнучкі 5vw, максимум 28px (для ПК) */
+    font-size: clamp(18px, 5vw, 28px); 
+    
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.9);
     margin: 0;
-    font-size: 24px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3); /* Легка тінь для читабельності */
+    line-height: 1.3;
+    
+    /* Захист від вилізання тексту за рамки екрана */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto; /* Додає дефіси і переносить частину слова, якщо воно екстремально довге */
 }
 
-/* Кнопка закриття панелі на мобільних */
+/* Кнопка закриття панелі */
 #sidebar-close-btn {
-    display: none; /* Приховано на ПК */
+    display: flex !important; /* Показуємо на всіх екранах */
+    justify-content: center;
+    align-items: center;
     position: absolute;
-    top: 10px;
+    top: 15px;
     right: 15px;
-    background: none;
+    padding: 4px 8px;
+    background: transparent;
     border: none;
-    font-size: 32px;
-    font-weight: 300;
-    color: white;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 22px;
+    line-height: 1;
     cursor: pointer;
     z-index: 2002;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-    transition: transform 0.2s;
+    transition: transform 0.2s, color 0.2s;
 }
 
 #sidebar-close-btn:hover {
-    transform: scale(1.1);
+    transform: scale(1.08);
+    color: #ffffff;
 }
 
 /* Тіло панелі (відступи для тексту) */
@@ -123,25 +167,26 @@ body, html {
     padding: 25px; /* Відсуваємо текст від країв */
     overflow-y: auto;
     flex-grow: 1;
+    color: var(--text-light);
 }
 
 #estate-description {
-    color: #444;
     line-height: 1.6;
     margin-bottom: 20px;
     text-align: justify; /* Робимо текст рівним по обох краях */
+    color: var(--text-light);
 }
 
 /* --- Нові елементи лівої панелі --- */
 #estate-coordinates {
     margin-top: 15px;
     font-size: 14px;
-    color: #666;
+    color: var(--text-light);
     font-weight: 500;
     display: flex;
     align-items: center;
     gap: 8px;
-    background: #f8f9fa;
+    background: rgba(255, 255, 255, 0.1);
     padding: 8px 12px;
     border-radius: 6px;
     border-left: 3px solid #3498db;
@@ -150,7 +195,7 @@ body, html {
 }
 
 #estate-coordinates:hover {
-    background-color: #e9ecef; /* Легке підсвічування при наведенні */
+    background-color: rgba(255, 255, 255, 0.15); /* Легке підсвічування при наведенні */
 }
 
 #estate-coordinates.hidden {
@@ -159,7 +204,7 @@ body, html {
 
 .sidebar-divider {
     border: none;
-    border-top: 1px solid #eaeaea;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
     margin: 25px 0;
 }
 
@@ -167,20 +212,20 @@ body, html {
 .btn-secondary {
     width: 100%;
     padding: 12px;
-    background-color: #ffffff;
-    border: 1px solid #dcdde1;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
     cursor: pointer;
     font-size: 15px;
     font-weight: 600;
-    color: #2f3640;
+    color: var(--text-light);
     transition: all 0.2s ease;
     box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
 .btn-secondary:hover {
-    background-color: #f5f6fa;
-    border-color: #c8d6e5;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
     transform: translateY(-1px);
 }
 
@@ -215,13 +260,15 @@ body, html {
     position: absolute;
     top: calc(20px + 44px + 8px); /* Позиція для ПК: Відступ + висота кнопки + відступ */
     right: 20px; /* Позиція для ПК */
-    background: white;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
+    color: var(--text-light);
     min-width: 200px; /* Мінімальна ширина, щоб не було занадто вузько */
-    border-radius: 8px;
+    border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.25);
     padding: 12px; /* Збільшимо внутрішні відступи */
-    /* Скидаємо стандартні стилі Leaflet */
-    border: none;
 }
 
 /* Стилізація самого списку шарів всередині панелі */
@@ -240,14 +287,16 @@ body, html {
     padding: 8px 10px;
     border-radius: 6px;
     transition: background-color 0.2s;
+    color: var(--text-light);
 }
 
 .leaflet-control-layers-list label:hover {
-    background-color: #f1f2f6;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .leaflet-control-layers-separator {
     margin: 5px 0 !important; /* Перевизначаємо стандартний негативний відступ Leaflet */
+    border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 /* Ховаємо стандартний контейнер Leaflet, коли він не розкритий */
@@ -267,25 +316,41 @@ body, html {
     z-index: 1001;
 }
 
+/* Сам рядок пошуку */
 #search-input {
     width: 100%;
-    padding: 12px 15px;
-    border: none;
+    padding: 10px 15px;
     border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    font-size: 16px;
     outline: none;
+    
+    /* Застосовуємо наш єдиний скляний стиль */
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
+    color: var(--text-light);
 }
 
+#search-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Випадаючий список результатів пошуку */
 #search-results {
     list-style: none;
-    background: white;
-    border-radius: 0 0 8px 8px;
-    margin-top: -5px; 
+    /* зберігаємо margin, padding, overflow та інші властивості */
+    margin-top: -5px;
     padding-top: 10px;
     max-height: 250px;
     overflow-y: auto;
     box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
+    border-radius: 8px;
+    color: var(--text-light);
 }
 
 #search-results.hidden {
@@ -295,11 +360,13 @@ body, html {
 #search-results li {
     padding: 12px 15px;
     cursor: pointer;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+    transition: background-color 0.2s;
 }
 
 #search-results li:hover {
-    background: #f1f2f6;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 /* --- Сучасний повзунець прозорості --- */
@@ -310,7 +377,11 @@ body, html {
     left: 50%; /* Центруємо по горизонталі */
     right: auto; /* Прибираємо позиціонування справа */
     transform: translateX(-50%); /* Компенсуємо ширину елемента для точного центрування */
-    background: white;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
+    color: var(--text-light);
     padding: 12px 25px;
     border-radius: 12px; 
     z-index: 1000;
@@ -321,7 +392,6 @@ body, html {
     gap: 15px;
     font-size: 14px;
     font-weight: 500;
-    color: #333;
 }
 
 #opacity-slider {
@@ -397,9 +467,9 @@ body, html {
         display: none;
     }
 
-    /* Показуємо кнопку закриття на мобільних */
+    /* Кнопка закриття залишається видимою на мобільних */
     #sidebar-close-btn {
-        display: block;
+        display: flex !important;
     }
 
     /* 2. Компактний пошук (звільняємо правий кут для шарів) */
@@ -474,18 +544,24 @@ body, html {
 }
 
 .modal-content {
-    background: white;
+    /* ті самі існуючі width, padding, radius, position зберігаються */
     padding: 30px 40px;
     border-radius: 12px;
     width: 90%;
     max-width: 700px;
     max-height: 85vh;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.25);
     position: relative;
     display: flex;
     flex-direction: column;
     transform: scale(1);
     transition: transform 0.3s ease;
+
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
+    color: var(--text-light);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .modal-overlay.hidden .modal-content {
@@ -517,90 +593,127 @@ body, html {
     background: none;
     border: none;
     font-size: 32px;
-    color: #95a5a6;
+    color: rgba(255, 255, 255, 0.7);
     cursor: pointer;
     transition: color 0.2s;
 }
 
 .modal-close-btn:hover {
-    color: #34495e;
+    color: #ffffff;
 }
 
 /* ========================================= */
-/* --- iOS Glass Design (Матова сіра поверхня) --- */
+/* --- Темний скляний дизайн для Leaflet --- */
 /* ========================================= */
 
-/* Універсальний клас для кнопок та панелей */
-.ios-glass-element {
-    /* Сірий фон з мінімальною прозорістю (90% непрозорості) */
-    background-color: rgba(225, 225, 230, 0.9); 
-    
-    /* Ефект "скла": розмиває елементи карти ПІД кнопкою */
-    backdrop-filter: blur(16px) saturate(120%);
-    -webkit-backdrop-filter: blur(16px) saturate(120%); /* Важливо для Safari/iOS */
-    
-    /* М'які "Еплівські" закруглення (squircle) */
-    border-radius: 14px; 
-    
-    /* Тонка світла рамка для ефекту відблиску на краях */
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    
-    /* Легка тінь для відриву від карти */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    
-    /* Колір іконок/тексту (темно-сірий для ідеального контрасту) */
-    color: #3a3a3c; 
-    
-    /* Плавність при наведенні */
-    transition: all 0.3s ease;
+/* Робимо перемикач шарів темним склом */
+.leaflet-control-layers {
+    background: var(--glass-bg) !important;
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-border) !important;
+    border-radius: 12px !important;
+    color: var(--text-light) !important;
 }
 
-/* Ефект при наведенні миші */
-.ios-glass-element:hover {
-    background-color: rgba(235, 235, 240, 0.95);
-    transform: scale(1.05); /* Легке збільшення */
-    cursor: pointer;
+/* Прибираємо білий фон Leaflet */
+.leaflet-control-layers-expanded {
+    background: var(--glass-bg) !important;
+    color: var(--text-light) !important;
 }
 
-/* ========================================= */
-/* --- Переопрацювання стандартних кнопок Leaflet --- */
-/* ========================================= */
-
-/* Прибираємо стандартні рамки контейнера Leaflet */
+/* Кнопки зуму + і - */
 .leaflet-bar {
     border: none !important;
     box-shadow: none !important;
-    background: transparent;
 }
 
-/* Стилізуємо самі кнопочки (+ і -) */
 .leaflet-bar a {
-    background-color: rgba(225, 225, 230, 0.9) !important;
-    backdrop-filter: blur(16px) saturate(120%);
-    -webkit-backdrop-filter: blur(16px) saturate(120%);
-    
-    /* Робимо їх окремими круглими/квадратними елементами, а не злитим блоком */
-    border-radius: 12px !important; 
-    border: 1px solid rgba(255, 255, 255, 0.6) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
-    color: #3a3a3c !important;
-    
-    /* Додаємо відстань між кнопкою + та - */
-    margin-bottom: 8px !important; 
-    
-    width: 36px !important;
-    height: 36px !important;
-    line-height: 36px !important; /* Центруємо іконку */
-    transition: all 0.2s ease;
-}
-
-/* Прибираємо заокруглення, які Leaflet ставить за замовчуванням для першої/останньої кнопки */
-.leaflet-bar a:first-child,
-.leaflet-bar a:last-child {
+    background-color: var(--glass-bg) !important;
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-border) !important;
+    color: var(--text-light) !important;
     border-radius: 12px !important;
+    margin-bottom: 8px !important;
 }
 
 .leaflet-bar a:hover {
-    background-color: rgba(235, 235, 240, 0.95) !important;
-    color: #000 !important;
+    background-color: rgba(45, 45, 50, 0.85) !important;
+    color: #ffffff !important;
+}
+
+/* Робимо стандартну іконку шарів Leaflet білою */
+.leaflet-control-layers-toggle {
+    filter: invert(1) brightness(2) !important;
+}
+
+/* Для твоєї окремої кастомної кнопки шарів (мобільна версія) */
+#custom-layers-btn {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
+    color: var(--text-light);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ========================================= */
+/* --- Оновлення та виправлення стилів темного скла --- */
+/* ========================================= */
+
+/* 1. Виправлення чіткості та кольору тексту в модальному вікні Термінологія */
+.modal-content h1, 
+.modal-content h2, 
+.modal-content h3, 
+.modal-content p, 
+.modal-content li,
+.modal-content span {
+    color: #ffffff !important; /* Гарантуємо ідеальний, яскравий білий колір для всього тексту */
+}
+
+/* Оновлюємо колір опису чи другорядного тексту, якщо хочеться зробити його трохи м'якшим, але читаємим */
+.modal-content p {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* 2. Повне кастомізування скролбарів (повзунків) під стиль iOS / macOS */
+/* Застосовуємо до бічної панелі, модального вікна та результатів пошуку */
+#sidebar::-webkit-scrollbar,
+.modal-content::-webkit-scrollbar,
+#search-results::-webkit-scrollbar {
+    width: 6px;  /* Робимо повзунець дуже тонким та акуратним */
+    height: 6px; /* Для горизонтального скролу, якщо з'явиться */
+}
+
+/* ПОВНІСТЮ ПРИБИРАЄМО білий чи сірий фон доріжки, по якій бігає повзунець */
+#sidebar::-webkit-scrollbar-track,
+.modal-content::-webkit-scrollbar-track,
+#search-results::-webkit-scrollbar-track {
+    background: transparent !important; 
+}
+
+/* Стилізуємо сам повзунець: світлий, напівпрозорий, із закругленими краями */
+#sidebar::-webkit-scrollbar-thumb,
+.modal-content::-webkit-scrollbar-thumb,
+#search-results::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.22) !important; /* Ледь помітний у спокої */
+    border-radius: 10px !important; /* Повністю круглі краї лінії */
+    transition: background 0.2s ease;
+}
+
+/* Коли користувач наводить мишку на повзунець — робимо його трохи яскравішим */
+#sidebar::-webkit-scrollbar-thumb:hover,
+.modal-content::-webkit-scrollbar-thumb:hover,
+#search-results::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4) !important; 
+}
+
+/* Додаємо підтримку для браузера Firefox (у нього своя логіка скролбарів) */
+#sidebar, 
+.modal-content,
+#search-results {
+    scrollbar-width: thin; /* Тонкий повзунець для Firefox */
+    scrollbar-color: rgba(255, 255, 255, 0.22) transparent; /* [Колір повзунця] [Колір доріжки] */
 }
