@@ -19,6 +19,8 @@ const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
 });
 
+const sadybyLabelsLayer = L.layerGroup();
+
 const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Tiles © Esri'
 });
@@ -43,10 +45,11 @@ const baseMaps = {
     "Звичайна карта": osm,
     "Супутник": satellite
 };
-const overlayMaps = {
-    "Історична карта": historicalLayer
+const overlays = {
+    "Історична карта": historicalLayer,
+    "Показувати назви": sadybyLabelsLayer // Додаємо тумблер у меню шарів
 };
-L.control.layers(baseMaps, overlayMaps, { position: 'topright' }).addTo(map);
+L.control.layers(baseMaps, overlays, { position: 'topright' }).addTo(map);
 
 // 5. Керування прозорістю історичного шару
 const opacitySlider = document.getElementById('opacity-slider');
@@ -54,7 +57,7 @@ opacitySlider.addEventListener('input', function (e) {
     historicalLayer.setOpacity(e.target.value);
 });
 
-// 6. Кастомна SVG іконка для садиб (Суцільний білий будиночок з темним контуром)
+// 6. Кастомна SVG іконка для садиб
 const customIcon = L.divIcon({
     className: 'custom-estate-icon',
     html: `<svg width="32" height="32" viewBox="0 0 24 24" fill="#ffffff" stroke="#2c3e50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -62,7 +65,9 @@ const customIcon = L.divIcon({
             <polyline points="9 22 9 12 15 12 15 22"></polyline>
            </svg>`,
     iconSize: [32, 32],
-    iconAnchor: [16, 32] // Вказуємо, що "низ" іконки - це точна координата
+    iconAnchor: [16, 32], 
+    popupAnchor: [0, -32],   // <- ДОДАЙ ЦЕ (піднімає віконце над іконкою)
+    tooltipAnchor: [0, -32]  // <- ДОДАЙ ЦЕ (піднімає постійну назву)
 });
 
 const selectedIcon = L.divIcon({
@@ -72,7 +77,73 @@ const selectedIcon = L.divIcon({
             <polyline points="9 22 9 12 15 12 15 22"></polyline>
            </svg>`,
     iconSize: [32, 32],
-    iconAnchor: [16, 32]
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32],   // <- ДОДАЙ ЦЕ
+    tooltipAnchor: [0, -32]  // <- ДОДАЙ ЦЕ
+});
+// ==========================================
+// Логіка масового відображення назв (Легкі Tooltips)
+// ==========================================
+map.on('overlayadd', function(e) {
+    if (e.name === "Показувати назви") {
+        showNamesActive = true; // Шар увімкнено
+        
+        markers.forEach(item => {
+            item.marker.bindTooltip(item.feature.properties.name, {
+                permanent: true, 
+                direction: 'top', 
+                className: 'custom-estate-tooltip' 
+            });
+            
+            // Магія: показуємо назву ТІЛЬКИ якщо інтерактивне віконце цієї садиби зараз НЕ відкрите
+            if (!item.marker.isPopupOpen()) {
+                item.marker.openTooltip();
+            }
+        });
+    }
+});
+
+map.on('overlayremove', function(e) {
+    if (e.name === "Показувати назви") {
+        showNamesActive = false; // Шар вимкнено
+        markers.forEach(item => {
+            item.marker.unbindTooltip(); 
+        });
+    }
+});
+
+map.on('overlayremove', function(e) {
+    if (e.name === "Показувати назви") {
+        permanentPopupsActive = false;
+        
+        markers.forEach(item => {
+            item.marker.closePopup(); // Закриваємо попап
+            item.marker.unbindPopup(); // Повністю відв'язуємо його, повертаючи карту до початкового стану
+        });
+    }
+});
+
+map.on('overlayremove', function(e) {
+    // Коли юзер вимикає шар
+    if (e.name === "Показувати назви") {
+        markers.forEach(item => {
+            item.marker.unbindTooltip(); // Прибираємо всі назви
+        });
+    }
+});
+
+// Автоматично ховаємо постійну назву, коли відкривається інтерактивне віконце
+map.on('popupopen', function() {
+    if (selectedMarker && showNamesActive) {
+        selectedMarker.closeTooltip();
+    }
+});
+
+// Автоматично повертаємо назву, коли інтерактивне віконце закривається
+map.on('popupclose', function() {
+    if (selectedMarker && showNamesActive) {
+        selectedMarker.openTooltip();
+    }
 });
 
 // 7. Реальні дані садиб у форматі GeoJSON
@@ -684,6 +755,7 @@ const leafletLayersControl = document.querySelector('.leaflet-control-layers');
 let markers = []; // Зберігаємо маркери для пошуку
 let selectedMarker = null; // Зберігаємо посилання на обраний маркер
 let previousViewState = null; // НОВЕ: Зберігаємо стан карти до кліку
+let showNamesActive = false;
 
 // Функція для оновлення стрілочок на кнопці-перемикачі
 function updateToggleIcon() {
@@ -773,8 +845,41 @@ L.geoJSON(estatesGeoJSON, {
             marker.setIcon(selectedIcon);
             selectedMarker = marker;
 
-            showEstateInfo(feature.properties, feature.geometry.coordinates);
-            flyToMarker(latlng, isPanelAlreadyOpen); 
+            // Стандартна логіка: на мобільному відкриваємо попап, на ПК - бічну панель
+            if (window.innerWidth <= 1024) {
+                map.flyTo(latlng, map.getZoom(), { duration: 1.5 });
+
+                const popupContent = document.createElement('div');
+                popupContent.className = 'custom-estate-popup';
+                popupContent.innerHTML = `
+                    <h4>${feature.properties.name}</h4>
+                    <span>Детальніше...</span>
+                `;
+
+                popupContent.addEventListener('click', () => {
+                    map.closePopup(); // Закриваємо віконце
+                    showEstateInfo(feature.properties, feature.geometry.coordinates);
+                    flyToMarker(latlng, isPanelAlreadyOpen);
+                });
+
+                map.closePopup(); // Прибираємо попереднє віконце перед відкриттям нового
+
+                // Створюємо незалежне віконце
+                L.popup({ 
+                    closeButton: true, 
+                    closeOnClick: false,
+                    offset: [0, -32], // Тримаємо над іконкою
+                    autoPan: false    // МАГІЯ: забороняємо ламати анімацію камери
+                })
+                .setLatLng(latlng)
+                .setContent(popupContent)
+                .openOn(map);
+
+            } else {
+                map.closePopup(); // Залізно гарантуємо, що віконця не буде на ПК
+                showEstateInfo(feature.properties, feature.geometry.coordinates);
+                flyToMarker(latlng, isPanelAlreadyOpen);
+            }
         });
         
         // Додаємо дані в масив для живого пошуку
@@ -828,10 +933,45 @@ searchInput.addEventListener('input', function(e) {
             item.marker.setIcon(selectedIcon);
             selectedMarker = item.marker;
 
-            showEstateInfo(item.feature.properties, item.feature.geometry.coordinates);
-            flyToMarker(item.latlng, isPanelAlreadyOpen);
+            if (window.innerWidth <= 1024) {
+                map.flyTo(item.latlng, map.getZoom(), { duration: 1.5 });
+
+                const popupContent = document.createElement('div');
+                popupContent.className = 'custom-estate-popup';
+                popupContent.innerHTML = `
+                    <h4>${item.feature.properties.name}</h4>
+                    <span>Детальніше...</span>
+                `;
+
+                popupContent.addEventListener('click', () => {
+                    map.closePopup();
+                    showEstateInfo(item.feature.properties, item.feature.geometry.coordinates);
+                    flyToMarker(item.latlng, isPanelAlreadyOpen);
+                });
+
+                map.closePopup();
+
+                L.popup({ 
+                    closeButton: true, 
+                    closeOnClick: false,
+                    offset: [0, -32], 
+                    autoPan: false 
+                })
+                .setLatLng(item.latlng)
+                .setContent(popupContent)
+                .openOn(map);
+
+            } else {
+                map.closePopup(); // Гарантуємо відсутність віконця на ПК
+                showEstateInfo(item.feature.properties, item.feature.geometry.coordinates);
+                flyToMarker(item.latlng, isPanelAlreadyOpen);
+            }
+
             searchResults.classList.add('hidden');
-            searchInput.value = item.feature.properties.name; 
+            searchInput.value = item.feature.properties.name;
+
+            searchResults.classList.add('hidden');
+            searchInput.value = item.feature.properties.name;
         });
         searchResults.appendChild(li);
     });
@@ -912,3 +1052,22 @@ terminologyModal.addEventListener('click', (e) => {
         hideModal();
     }
 });
+
+// ==========================================
+// Безпечне керування зникненням тексту в пошуку
+// ==========================================
+if (searchInput) {
+    searchInput.addEventListener('focus', function() {
+        // Запам'ятовуємо текст ТІЛЬКИ якщо він не порожній
+        if (this.getAttribute('placeholder') !== '') {
+            this.setAttribute('data-placeholder', this.getAttribute('placeholder'));
+        }
+        this.setAttribute('placeholder', ''); // Ховаємо текст
+    });
+
+    searchInput.addEventListener('blur', function() {
+        // Повертаємо текст назад (якщо data-placeholder порожній, ставимо стандартний)
+        const savedPlaceholder = this.getAttribute('data-placeholder') || 'Пошук садиби...';
+        this.setAttribute('placeholder', savedPlaceholder);
+    });
+}

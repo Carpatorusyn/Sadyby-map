@@ -13,7 +13,15 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* ТУТ FONT-FAMILY БІЛЬШЕ НЕМАЄ */
+}
+
+body, html {
+    font-family: 'Roboto', Tahoma, Geneva, sans-serif; /* ДОДАЛИ СЮДИ */
+    height: 100vh;
+    width: 100vw;
+    background: #000;
+    overflow: hidden;
 }
 
 body, html {
@@ -125,11 +133,13 @@ body, html {
     /* МАГІЯ ТУТ: мінімум 18px (для найменших телефонів), гнучкі 5vw, максимум 28px (для ПК) */
     font-size: clamp(18px, 5vw, 28px); 
     
+    .sidebar-header h2, .estate-header h2 {
+    font-family: 'Cormorant Infant', serif;
+    color: #ffffff !important;
+    font-size: clamp(22px, 6vw, 32px); 
     font-weight: 700;
-    letter-spacing: 1px;
-    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.9);
-    margin: 0;
-    line-height: 1.3;
+    /* ... інші твої стилі ... */
+}
     
     /* Захист від вилізання тексту за рамки екрана */
     word-wrap: break-word;
@@ -171,9 +181,12 @@ body, html {
 }
 
 #estate-description {
+    font-family: 'Cormorant Infant', serif;
+    font-size: 18px; /* Тримаємо трохи збільшеним для комфорту */
+    font-weight: 400;
     line-height: 1.6;
     margin-bottom: 20px;
-    text-align: justify; /* Робимо текст рівним по обох краях */
+    text-align: justify;
     color: var(--text-light);
 }
 
@@ -244,8 +257,8 @@ body, html {
     position: absolute;
     top: 20px; /* Позиція для ПК */
     right: 20px; /* Позиція для ПК */
-    width: 44px;
-    height: 44px;
+    width: 47px;
+    height: 47px;
     background: white;
     border: none;
     border-radius: 8px;
@@ -308,6 +321,7 @@ body, html {
 
 /* --- Плаваючий пошук (ПК) --- */
 #search-container {
+    position: relative; /* Це критично важливо, щоб лупа не "полетіла" за межі */
     position: absolute;
     top: 20px;
     left: 50%; 
@@ -319,20 +333,32 @@ body, html {
 /* Сам рядок пошуку */
 #search-input {
     width: 100%;
-    padding: 10px 15px;
-    border-radius: 8px;
+    padding: 12px 40px 12px 20px; /* Додаємо відступ справа, щоб текст не наїжджав на лупу */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 25px;
+    font-size: 18px; /* Збільшений текст */
+    text-align: center; /* Текст по центру */
     outline: none;
-    
-    /* Застосовуємо наш єдиний скляний стиль */
     background: var(--glass-bg);
+    color: var(--text-light);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
-    border: var(--glass-border);
-    color: var(--text-light);
+    box-shadow: var(--glass-shadow);
+    transition: all 0.3s ease;
 }
 
 #search-input::placeholder {
     color: rgba(255, 255, 255, 0.6);
+}
+
+#search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.6); /* Напівпрозорий колір, щоб підходив під темне скло */
+    pointer-events: none; /* Магія: клік буде проходити крізь лупу на рядок пошуку */
 }
 
 /* Випадаючий список результатів пошуку */
@@ -382,23 +408,24 @@ body, html {
     -webkit-backdrop-filter: var(--glass-blur);
     border: var(--glass-border);
     color: var(--text-light);
-    padding: 12px 25px;
+    padding: 10px 15px;
     border-radius: 12px; 
     z-index: 1000;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 15px;
-    font-size: 14px;
+    gap: 10px;
+    font-size: 16px;
     font-weight: 500;
+    width: 300px;
 }
 
 #opacity-slider {
     -webkit-appearance: none;
     appearance: none;
     width: 150px;
-    height: 14px; 
+    height: 10px; 
     border-radius: 6px;
     outline: none;
     background: repeating-linear-gradient(
@@ -433,7 +460,7 @@ body, html {
 /* ========================================= */
 /* --- Мобільна адаптація (Телефони) --- */
 /* ========================================= */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     
     /* 1. Повертаємо нижню панель замість бокової */
     /* ОНОВЛЕНО: Панель тепер є модальним вікном по центру */
@@ -483,10 +510,16 @@ body, html {
         transform: none; /* Скасовуємо центрування */
     }
 
-    /* Адаптуємо позицію кастомної кнопки для мобільних */
+    .search-icon {
+        right: 12px;
+    }
+
+    /* Адаптуємо позицію та розмір кастомної кнопки для мобільних */
     #custom-layers-btn {
         top: calc(env(safe-area-inset-top, 0px) + 12px);
         right: calc(env(safe-area-inset-right, 0px) + 10px);
+        width: 54px;
+        height: 54px;
     }
 
     /* Адаптуємо позицію панелі шарів для мобільних */
@@ -512,7 +545,6 @@ body, html {
         text-align: center;
         line-height: 1.2;
     }
-
     /* Адаптація контролів у нижньому правому куті (кнопки зуму) */
     .leaflet-bottom.leaflet-right {
         bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
@@ -598,6 +630,67 @@ body, html {
     transition: color 0.2s;
 }
 
+/* ========================================= */
+/* --- ТЕЛЕФОНИ (екрани менші за 768px) --- */
+/* ========================================= */
+@media (max-width: 768px) {
+    /* 1. Кладемо контейнер з атрибуцією на самісіньку підлогу */
+    .leaflet-bottom.leaflet-right {
+        bottom: 0 !important;
+        right: 0 !important;
+    }
+
+    /* 2. Налаштовуємо саму чорну полоску та текст */
+    .leaflet-control-attribution {
+        margin: 0 !important; /* Прибираємо всі відступи */
+        padding: 4px 8px !important; /* Робимо акуратні поля навколо тексту */
+        background: rgba(0, 0, 0, 0.85) !important; /* Темна полоска, якщо вона злетіла */
+        color: rgba(255, 255, 255, 0.6) !important; /* Тьмяний текст, щоб не відвертав увагу */
+        font-size: 10px !important; /* Зменшуємо розмір для телефону */
+        border-top-left-radius: 8px; /* Робимо красиве закруглення лівого кута */
+    }
+
+    /* 3. Прибираємо підкреслення з посилань у цьому тексті */
+    .leaflet-control-attribution a {
+        color: rgba(255, 255, 255, 0.8) !important;
+        text-decoration: none !important;
+    }
+
+    /* 4. Піднімаємо панель прозорості, щоб вона не наїжджала на текст */
+    #opacity-control {
+        bottom: 35px !important; /* Відсуваємо вгору від підлоги */
+        width: 200px;
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    #opacity-control label,
+    #opacity-control span {
+        font-size: 12px;
+    }
+
+    /* Ювелірна стиковка інформаційної панелі з повзунком (телефони) */
+    /* УВАГА: Заміни #info-panel на свій ID панелі */
+    #info-panel {
+        /* 1. Відступи знизу та з боків (робимо плаваючу картку) */
+        bottom: 15px !important; /* Відступ від самого низу екрана */
+        left: 10px !important; /* Акуратні зазори по боках */
+        right: 10px !important;
+        width: auto !important; /* Дозволяємо панелі розтягнутися між left та right */
+
+        /* 2. Зазор зверху */
+        max-height: 80vh !important; /* Панель займатиме максимум 80% висоти екрана, залишаючи 20% зверху прозорими */
+        
+        /* 3. Перекриття повзунка */
+        z-index: 9999 !important; /* Ця цифра гарантує, що панель ляже ПОВЕРХ повзунка прозорості та сховає його */
+
+        /* 4. Краса */
+        border-radius: 20px !important; /* Оскільки панель тепер відірвана від країв, робимо їй гарні кути з усіх боків */
+        margin: 0 !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important; /* Додаємо тінь, щоб вона візуально "висіла" над картою */
+    }
+}
+
 .modal-close-btn:hover {
     color: #ffffff;
 }
@@ -641,6 +734,49 @@ body, html {
 .leaflet-bar a:hover {
     background-color: rgba(45, 45, 50, 0.85) !important;
     color: #ffffff !important;
+}
+
+/* Ідеальне центрування кнопок зуму */
+.leaflet-control-zoom a {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: normal !important; /* Скидаємо стандартні криві відступи Leaflet */
+}
+
+/* Стилізація самого прямокутника попапу */
+.leaflet-popup-content-wrapper {
+    background: rgba(30, 30, 30, 0.8) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 12px !important;
+    color: var(--text-light) !important;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4) !important;
+    padding: 0 !important;
+}
+
+/* Стилізація стрілочки (хвостика) внизу */
+.leaflet-popup-tip {
+    background: rgba(30, 30, 30, 0.8) !important;
+    backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-top: none !important;
+    border-left: none !important;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4) !important;
+}
+
+.custom-estate-popup h4 {
+    font-family: 'Roboto', serif !important;
+    margin: 0 0 5px 0;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.custom-estate-popup span {
+    font-family: 'Roboto', sans-serif; /* Повертаємо строгість кнопці */
+    font-size: 13px;
+    font-weight: 500;
 }
 
 /* Робимо стандартну іконку шарів Leaflet білою */
@@ -716,4 +852,43 @@ body, html {
 #search-results {
     scrollbar-width: thin; /* Тонкий повзунець для Firefox */
     scrollbar-color: rgba(255, 255, 255, 0.22) transparent; /* [Колір повзунця] [Колір доріжки] */
+}
+
+/* Додатково підкоригуємо відступи всередині, оскільки хрестика більше немає й місце звільнилося */
+.leaflet-popup-content {
+    margin: 8px 12px !important;
+}
+/* ========================================= */
+/* --- Стилі для постійних назв (Шар "Показувати назви") --- */
+/* ========================================= */
+.leaflet-tooltip.custom-estate-tooltip {
+    background: rgba(30, 30, 30, 0.8) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 8px !important; /* Трохи менші кути для акуратності */
+    color: var(--text-light) !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
+    padding: 5px 10px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    
+    /* МАГІЯ: Робить ці плашки "прозорими" для кліків і пальців, дозволяючи зумити карту */
+    pointer-events: none !important; 
+}
+
+/* Перефарбовуємо нижній "хвостик", щоб він зливався з темним склом */
+.leaflet-tooltip-top.custom-estate-tooltip::before {
+    border-top-color: rgba(30, 30, 30, 0.8) !important;
+}
+
+/* Перефарбовуємо нижній "хвостик", щоб він зливався з темним склом */
+.leaflet-tooltip-top.custom-estate-tooltip::before {
+    border-top-color: rgba(30, 30, 30, 0.8) !important;
+}
+/* --- ПРИМУСОВИЙ ШРИФТ ДЛЯ ЗАГОЛОВКА САДИБИ --- */
+#estate-name {
+    font-family: 'Cormorant Infant', serif !important;
 }
