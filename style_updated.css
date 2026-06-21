@@ -17,7 +17,7 @@
 }
 
 body, html {
-    font-family: 'Roboto', Tahoma, Geneva, sans-serif; /* ДОДАЛИ СЮДИ */
+    font-family: 'Nunito', sans-serif; /* Тепер весь інтерфейс, кнопки та пошук будуть на Nunito */
     height: 100vh;
     width: 100vw;
     background: #000;
@@ -51,7 +51,7 @@ body, html {
     color: var(--text-light);
     z-index: 2000;
     box-shadow: 0 5px 20px rgba(0,0,0,0.2); /* Тінь як у модального вікна */
-    border-radius: 12px; /* Згладжені кути */
+    border-radius: 20px; /* Згладжені кути */
     transition: transform 0.3s ease, opacity 0.3s ease;
     display: flex;
     flex-direction: column;
@@ -104,47 +104,41 @@ body, html {
 /* Оновлений блок шапки садиби з фоном */
 .sidebar-header, .estate-header { 
     position: relative;
-    /* Збільшуємо висоту блоку (можеш гратися з цифрою 50px, якщо треба ще вище) */
     padding: 50px 20px; 
     
-    /* Центруємо елементи по вертикалі та горизонталі */
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
     
-    /* Окремо прописуємо фон, щоб уникнути багів з "полосками" */
-    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.85)), url('background_name.jpg');
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.488)), url('background_name.jpg');
     background-size: cover !important; 
     background-position: center !important;
     background-repeat: no-repeat !important;
     
-    /* Прибираємо тонку лінію знизу, яка давала артефакт */
     border-bottom: none; 
-    
-    /* Додаємо внутрішню тінь знизу, щоб картинка плавно "розчинялася" в інтерфейсі панелі */
     box-shadow: inset 0 -10px 20px rgba(0,0,0,0.4);
+
+    /* --- МАГІЯ ТУТ: ПРИМУСОВО заокруглюємо верхні кути самого фону --- */
+    border-top-left-radius: 20px; 
+    border-top-right-radius: 20px;
 }
 
 /* Оновлений текст назви садиби з адаптивним розміром */
 .sidebar-header h2, .estate-header h2 {
-    color: #ffffff !important;
-    
-    /* МАГІЯ ТУТ: мінімум 18px (для найменших телефонів), гнучкі 5vw, максимум 28px (для ПК) */
-    font-size: clamp(18px, 5vw, 28px); 
-    
-    .sidebar-header h2, .estate-header h2 {
     font-family: 'Cormorant Infant', serif;
     color: #ffffff !important;
-    font-size: clamp(22px, 6vw, 32px); 
+    font-size: clamp(26px, 8vw, 38px); /* Оптимальний баланс між мобільним та ПК */
     font-weight: 700;
-    /* ... інші твої стилі ... */
-}
     
     /* Захист від вилізання тексту за рамки екрана */
     word-wrap: break-word;
     overflow-wrap: break-word;
-    hyphens: auto; /* Додає дефіси і переносить частину слова, якщо воно екстремально довге */
+    hyphens: auto;
+    
+    /* Легка тінь, щоб білий текст ідеально читався навіть на світлих частинах фото */
+    text-shadow: 1px 2px 6px rgba(0, 0, 0, 0.8);
+    margin-bottom: 10px;
 }
 
 /* Кнопка закриття панелі */
@@ -181,8 +175,8 @@ body, html {
 }
 
 #estate-description {
-    font-family: 'Cormorant Infant', serif;
-    font-size: 18px; /* Тримаємо трохи збільшеним для комфорту */
+    font-family: 'Cormorant Unicase', serif;
+    font-size: 17px; /* Тримаємо трохи збільшеним для комфорту */
     font-weight: 400;
     line-height: 1.6;
     margin-bottom: 20px;
@@ -332,6 +326,26 @@ body, html {
 
 /* Сам рядок пошуку */
 #search-input {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 500;    
+    width: 100%;
+    padding: 12px 40px 12px 20px; /* Додаємо відступ справа, щоб текст не наїжджав на лупу */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 25px;
+    font-size: 18px; /* Збільшений текст */
+    text-align: center; /* Текст по центру */
+    outline: none;
+    background: var(--glass-bg);
+    color: var(--text-light);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-shadow);
+    transition: all 0.3s ease;
+}
+#btn-terminology, 
+.close-btn {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 500;    
     width: 100%;
     padding: 12px 40px 12px 20px; /* Додаємо відступ справа, щоб текст не наїжджав на лупу */
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -472,7 +486,8 @@ body, html {
         max-width: 500px;
         height: auto;
         max-height: 80vh; /* Зменшено висоту для створення проміжку зверху */
-        border-radius: 12px;
+        border-radius: 20px;
+        overflow: hidden;
         box-shadow: 0 5px 20px rgba(0,0,0,0.25);
     }
 
@@ -857,6 +872,10 @@ body, html {
 /* Додатково підкоригуємо відступи всередині, оскільки хрестика більше немає й місце звільнилося */
 .leaflet-popup-content {
     margin: 8px 12px !important;
+    text-align: center !important; /* МАГІЯ ТУТ: Центруємо весь текст */
+    font-family: 'Nunito', sans-serif !important; /* Застосуємо наш акуратний UI-шрифт */
+    font-size: 15px !important; /* Робимо текст трохи більш читабельним */
+    line-height: 1.4 !important;
 }
 /* ========================================= */
 /* --- Стилі для постійних назв (Шар "Показувати назви") --- */
