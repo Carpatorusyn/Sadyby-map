@@ -10,6 +10,13 @@ const map = L.map('map', {
     minZoom: 6 // Забороняємо віддаляти на рівень всієї планети
 }).setView([51.0, 31.0], 8);
 
+map.on('zoom', function() {
+    // Нічого не робимо, це просто примушує карту перерахувати 
+    // z-index та позиції маркерів під час зуму
+});
+
+
+
 // Додаємо кнопки зуму в правий нижній кут
 L.control.zoom({ position: 'bottomright' }).addTo(map);
 
@@ -57,30 +64,7 @@ opacitySlider.addEventListener('input', function (e) {
     historicalLayer.setOpacity(e.target.value);
 });
 
-// 6. Кастомна SVG іконка для садиб
-const customIcon = L.divIcon({
-    className: 'custom-estate-icon',
-    html: `<svg width="32" height="32" viewBox="0 0 24 24" fill="#ffffff" stroke="#2c3e50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-           </svg>`,
-    iconSize: [32, 32],
-    iconAnchor: [16, 32], 
-    popupAnchor: [0, -32],   // <- ДОДАЙ ЦЕ (піднімає віконце над іконкою)
-    tooltipAnchor: [0, -32]  // <- ДОДАЙ ЦЕ (піднімає постійну назву)
-});
 
-const selectedIcon = L.divIcon({
-    className: 'custom-estate-icon-selected',
-    html: `<svg width="32" height="32" viewBox="0 0 24 24" fill="#e74c3c" stroke="#2c3e50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-           </svg>`,
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-    popupAnchor: [0, -32],   // <- ДОДАЙ ЦЕ
-    tooltipAnchor: [0, -32]  // <- ДОДАЙ ЦЕ
-});
 // ==========================================
 // Логіка масового відображення назв (Легкі Tooltips)
 // ==========================================
@@ -143,6 +127,14 @@ map.on('popupopen', function() {
 map.on('popupclose', function() {
     if (selectedMarker && showNamesActive) {
         selectedMarker.openTooltip();
+    }
+});
+
+// Автоматичне закриття попапів при кліку на будь-яке порожнє місце карти
+map.on('click', function(e) {
+    // Перевіряємо, чи клікнули саме по карті, а не по маркеру чи панелі
+    if (e.originalEvent.target.id === 'map' || e.originalEvent.target.classList.contains('leaflet-container')) {
+        map.closePopup(); // Закриває відкрите віконце Leaflet
     }
 });
 
@@ -768,7 +760,7 @@ function updateToggleIcon() {
 // toggleSidebarBtn.addEventListener('click', () => {
 //     sidebar.classList.toggle('hidden');
 //     if (sidebar.classList.contains('hidden') && selectedMarker) {
-//         selectedMarker.setIcon(customIcon);
+//         selectedMarker.setIcon(estateIcon);
 //         selectedMarker = null;
 //         resetMapView(); // НОВЕ: повертаємо зум та координати
 //     }
@@ -800,17 +792,20 @@ function showEstateInfo(properties, coordinates) {
     searchInput.value = ''; // Очищаємо рядок пошуку
 }
 
-// Функція для плавного "розумного" наближення до маркера
+// Функція для плавного "розумного" наближення до маркера (БЕЗ РИВКІВ)
 function flyToMarker(latlng, isPanelAlreadyOpen) {
     const currentZoom = map.getZoom();
     
-    // Якщо панель вже відкрита — зберігаємо поточний зум. 
-    // Якщо тільки відкриваємо (перший клік) — робимо легкий поштовх (+0.5).
-    const targetZoom = isPanelAlreadyOpen ? currentZoom : Math.min(currentZoom + 0.5, 10);
+    // Якщо панель вже відкрита — зберігаємо поточний зум (щоб не було зайвого скакання туди-сюди)
+    // Якщо тільки відкриваємо — робимо легкий поштовх (+0.5). 
+    // Максимальний зум обмежимо, наприклад, 14-15, щоб історична карта не розмивалася.
+    const targetZoom = isPanelAlreadyOpen ? currentZoom : Math.min(currentZoom + 0.5, 14);
     
-    map.setView(latlng, targetZoom, {
+    // Використовуємо flyTo замість setView для ідеальної плавності
+    map.flyTo(latlng, targetZoom, {
         animate: true,
-        duration: 1.2
+        duration: 1.5,      // Тривалість польоту в секундах (1.5 — золота середина)
+        easeLinearity: 0.25 // Плавність розгону та гальмування камери
     });
 }
 
@@ -825,10 +820,34 @@ function resetMapView() {
     }
 }
 
-// Додаємо садиби (GeoJSON) на карту
+// ==========================================
+// 1. СТВОРЮЄМО НОВІ ІКОНКИ (замість customIcon та selectedEstateIcon)
+// ==========================================
+// Звичайна іконка з пантеоном
+const estateIcon = L.divIcon({
+    className: 'emoji-estate-marker',
+    html: '🏛️',
+    iconSize: [36, 36],
+    iconAnchor: [18, 18], 
+    popupAnchor: [0, -20]
+});
+
+// Активна іконка з пантеоном (додається клас active для червоної рамки)
+const selectedEstateIcon = L.divIcon({
+    className: 'emoji-estate-marker active', 
+    html: '🏛️',
+    iconSize: [36, 36], 
+    iconAnchor: [18, 18], 
+    popupAnchor: [0, -20]
+});
+
+// ==========================================
+// 2. ВАШ БЛОК ДОДАВАННЯ ДАНИХ (ОНОВЛЕНИЙ)
+// ==========================================
 L.geoJSON(estatesGeoJSON, {
     pointToLayer: function (feature, latlng) {
-        const marker = L.marker(latlng, { icon: customIcon });
+        // Використовуємо НОВУ іконку
+        const marker = L.marker(latlng, { icon: estateIcon });
         
         // Клік по маркеру садиби на карті
         marker.on('click', () => {
@@ -839,10 +858,12 @@ L.geoJSON(estatesGeoJSON, {
                 previousViewState = { center: map.getCenter(), zoom: map.getZoom() };
             }
 
+            // Повертаємо попередньому маркеру звичайну іконку
             if (selectedMarker) {
-                selectedMarker.setIcon(customIcon);
+                selectedMarker.setIcon(estateIcon);
             }
-            marker.setIcon(selectedIcon);
+            // Задаємо новому (клікнутому) маркеру активну іконку
+            marker.setIcon(selectedEstateIcon);
             selectedMarker = marker;
 
             // Стандартна логіка: на мобільному відкриваємо попап, на ПК - бічну панель
@@ -868,7 +889,7 @@ L.geoJSON(estatesGeoJSON, {
                 L.popup({ 
                     closeButton: true, 
                     closeOnClick: false,
-                    offset: [0, -32], // Тримаємо над іконкою
+                    offset: [0, -20], // Змінив відступ під нові круглі іконки
                     autoPan: false    // МАГІЯ: забороняємо ламати анімацію камери
                 })
                 .setLatLng(latlng)
@@ -928,9 +949,9 @@ searchInput.addEventListener('input', function(e) {
             }
 
             if (selectedMarker) {
-                selectedMarker.setIcon(customIcon);
+                selectedMarker.setIcon(estateIcon);
             }
-            item.marker.setIcon(selectedIcon);
+            item.marker.setIcon(selectedEstateIcon);
             selectedMarker = item.marker;
 
             if (window.innerWidth <= 1024) {
@@ -1000,7 +1021,7 @@ map.on('click', () => {
     if (leafletLayersControl) leafletLayersControl.classList.remove('leaflet-control-layers-expanded');
 
     if (selectedMarker) {
-        selectedMarker.setIcon(customIcon);
+        selectedMarker.setIcon(estateIcon);
         selectedMarker = null;
         resetMapView(); // НОВЕ: повертаємо зум та координати
     }
@@ -1019,7 +1040,7 @@ estateCoordinatesContainer.addEventListener('click', () => {
 sidebarCloseBtn.addEventListener('click', () => {
     sidebar.classList.add('hidden');
     if (selectedMarker) {
-        selectedMarker.setIcon(customIcon);
+        selectedMarker.setIcon(estateIcon);
         selectedMarker = null;
         resetMapView(); // НОВЕ: повертаємо зум та координати
     }
@@ -1071,3 +1092,19 @@ if (searchInput) {
         this.setAttribute('placeholder', savedPlaceholder);
     });
 }
+// Заморожуємо іконки під час руху карти, щоб вони не "плавали"
+map.on('movestart', function() {
+    const markers = document.querySelectorAll('.emoji-estate-marker');
+    markers.forEach(m => {
+        m.style.transition = 'none'; // Вимикаємо анімацію
+        m.style.pointerEvents = 'none'; // Забороняємо кліки, щоб не було "підсмикування"
+    });
+});
+
+map.on('moveend', function() {
+    const markers = document.querySelectorAll('.emoji-estate-marker');
+    markers.forEach(m => {
+        m.style.transition = ''; // Повертаємо анімацію
+        m.style.pointerEvents = 'auto'; // Повертаємо можливість клікати
+    });
+});

@@ -671,9 +671,10 @@ body, html {
         text-decoration: none !important;
     }
 
-    /* 4. Піднімаємо панель прозорості, щоб вона не наїжджала на текст */
+    /* 4. Опускаємо панель прозорості нижче */
     #opacity-control {
-        bottom: 35px !important; /* Відсуваємо вгору від підлоги */
+        /* Зменшуємо відступ до 10px, але враховуємо безпечну зону iPhone (safe-area) */
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 10px) !important; 
         width: 200px;
         padding: 12px;
         font-size: 14px;
@@ -910,4 +911,54 @@ body, html {
 /* --- ПРИМУСОВИЙ ШРИФТ ДЛЯ ЗАГОЛОВКА САДИБИ --- */
 #estate-name {
     font-family: 'Cormorant Infant', serif !important;
+}
+/* Виправлення багу з подвійним тапом на меню шарів (Leaflet) для мобільних/планшетів */
+.leaflet-control-layers-list label {
+    pointer-events: auto !important;
+    touch-action: manipulation !important;
+}
+.leaflet-control-layers-toggle {
+    touch-action: manipulation !important;
+}
+
+/* Кастомний маркер-емодзі для садиб */
+.emoji-estate-marker {
+    background-color: #4a3b32; /* Темно-коричневий фон */
+    border: 2px solid #f4f1ea; /* Світла бежева рамка */
+    border-radius: 50%;
+    width: 36px !important;
+    height: 36px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;           /* Розмір нашого пантеону */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    will-change: transform;
+}
+
+/* Наведення мишкою (на ПК) */
+.emoji-estate-marker:hover {
+    transform: scale(1.1);
+    background-color: #6a5647;
+    z-index: 1000 !important;
+}
+
+/* АКТИВНА САДИБА (як ви просили: червона обводка) */
+.emoji-estate-marker.active {
+    border: 3px solid #ff4d4d; /* Яскраво-червона обводка */
+    background-color: #4a3b32; /* Фон залишаємо тим самим */
+    transform: scale(1.15);    /* Робимо трохи більшим */
+    box-shadow: 0 0 15px rgba(255, 77, 77, 0.5); /* Додаємо легке червоне світіння */
+    z-index: 1001 !important;
+}
+/* Додай цю властивість до класу .emoji-estate-marker */
+.emoji-estate-marker {
+    /* ... твої інші стилі ... */
+    
+    /* Ця властивість дозволяє браузеру краще оптимізувати 
+       відображення при масштабуванні */
+    contain: layout style;
+    /* Додаємо невелику анімацію масштабу при зміні розміру іконки */
+    transition: transform 0.1s ease-out;
 }
