@@ -368,11 +368,32 @@ body, html {
 #search-icon {
     position: absolute;
     right: 15px;
-    top: 50%;
+    top: 25px; /* Жорстка прив'язка до поля вводу, більше ніяких стрибків! */
     transform: translateY(-50%);
     font-size: 16px;
-    color: rgba(255, 255, 255, 0.6); /* Напівпрозорий колір, щоб підходив під темне скло */
-    pointer-events: none; /* Магія: клік буде проходити крізь лупу на рядок пошуку */
+    color: rgba(255, 255, 255, 0.6);
+    z-index: 1010; /* Піднімаємо над усім */
+    
+    /* ДОЗВОЛЯЄМО КЛІК: */
+    pointer-events: auto; 
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+#search-icon {
+    /* Робимо іконку клікабельною */
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+/* Секрет, щоб сама картинка SVG не перехоплювала клік, а клікався весь блок */
+#search-icon svg {
+    pointer-events: none;
+}
+
+/* Коли це хрестик (є клас clearable), при наведенні робимо його червоним */
+#search-icon.clearable:hover {
+    color: #ff4d4d;
 }
 
 /* Випадаючий список результатів пошуку */
@@ -527,6 +548,7 @@ body, html {
 
     .search-icon {
         right: 12px;
+        top: 25px; /* Так само жорстко фіксуємо */
     }
 
     /* Адаптуємо позицію та розмір кастомної кнопки для мобільних */
@@ -933,7 +955,9 @@ body, html {
     justify-content: center;
     font-size: 20px;           /* Розмір нашого пантеону */
     box-shadow: 0 4px 6px rgba(0,0,0,0.5);
-    transition: background-color 0.2s ease, transform 0.2s ease;
+    
+    /* Анімація тепер працюватиме ідеально, бо не конфліктує з координатами карти */
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     will-change: transform;
 }
 
@@ -952,13 +976,217 @@ body, html {
     box-shadow: 0 0 15px rgba(255, 77, 77, 0.5); /* Додаємо легке червоне світіння */
     z-index: 1001 !important;
 }
-/* Додай цю властивість до класу .emoji-estate-marker */
-.emoji-estate-marker {
-    /* ... твої інші стилі ... */
+
+/* =========================================
+   СТАРТОВИЙ ЕКРАН (Welcome Screen)
+========================================= */
+.welcome-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(74, 59, 50, 0.95); /* Напівпрозорий темний фон */
+    backdrop-filter: blur(5px); /* Розмиття карти на фоні */
+    z-index: 99999; /* Поверх абсолютно всього */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Клас для приховування екрана */
+.welcome-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.welcome-content {
+    background-color: #f4f1ea; /* Архівний папір */
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+    max-width: 700px;
+    width: 100%;
+    text-align: center;
+    border: 3px solid #d4c5b9;
+    max-height: 90vh; /* Щоб на мобільних не вилазило за екран */
+    overflow-y: auto; /* Дозволяє скролити текст, якщо екран маленький */
+}
+
+.welcome-title {
+    font-family: 'Cormorant Unicase', serif;
+    font-size: 2.5rem;
+    color: #4a3b32;
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #d4c5b9;
+    padding-bottom: 15px;
+}
+
+.welcome-body {
+    font-size: 1.1rem;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.welcome-btn {
+    background-color: #4a3b32;
+    color: #f4f1ea;
+    border: 2px solid #4a3b32;
+    padding: 15px 35px;
+    font-size: 1.2rem;
+    font-family: 'Cormorant Unicase', serif;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    margin-bottom: 30px;
+}
+
+.welcome-btn:hover {
+    background-color: #f4f1ea;
+    color: #4a3b32;
+}
+
+.welcome-footer {
+    font-size: 0.85rem;
+    color: #666;
+    border-top: 1px solid #d4c5b9;
+    padding-top: 20px;
+    text-align: left;
+    line-height: 1.5;
+}
+
+.welcome-footer p {
+    margin: 5px 0;
+}
+
+.welcome-footer a {
+    color: #4a3b32;
+    text-decoration: underline;
+}
+
+.welcome-contacts {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #d4c5b9; /* Пунктирна лінія для відділення контактів */
+}
+
+.welcome-contacts .contacts-title {
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    color: #4a3b32;
+}
+
+.welcome-contacts a {
+    color: #4a3b32;
+    text-decoration: none; /* Прибираємо стандартне підкреслення */
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.welcome-contacts a:hover {
+    color: #ff4d4d; /* Колір при наведенні (як у вашого хрестика пошуку) */
+    text-decoration: underline;
+}
+
+/* =========================================
+   КНОПКА "i" ДЛЯ ПОВЕРНЕННЯ (Liquid Glass)
+========================================= */
+.info-circle-btn {
+    position: fixed; /* Фіксуємо відносно екрана, а не карти */
+    bottom: 30px;    /* Відступ знизу */
+    left: 20px;      /* Відступ зліва */
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Unicase', serif; /* Історичний шрифт для букви i */
+    font-size: 24px;
+    font-weight: bold;
+    z-index: 1000; /* Щоб була над картою, але під стартовим вікном */
+    cursor: pointer;
     
-    /* Ця властивість дозволяє браузеру краще оптимізувати 
-       відображення при масштабуванні */
-    contain: layout style;
-    /* Додаємо невелику анімацію масштабу при зміні розміру іконки */
-    transition: transform 0.1s ease-out;
+    /* Застосовуємо твій Liquid Glass стиль */
+    background: var(--glass-bg);
+    color: var(--text-light);
+    border: var(--glass-border);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur); /* Для підтримки Safari/iPhone */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); /* Легка тінь для об'єму */
+    
+    transition: all 0.3s ease;
+}
+
+/* Ефект при наведенні мишкою (на ПК) */
+.info-circle-btn:hover {
+    transform: scale(1.1);
+    background: rgba(40, 40, 45, 0.85); /* Робимо скло трохи світлішим/щільнішим */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+}
+
+/* =========================================
+   АДАПТАЦІЯ ДЛЯ ТЕЛЕФОНІВ ТА ПЛАНШЕТІВ
+========================================= */
+@media (max-width: 768px) {
+    .info-circle-btn {
+        /* Трохи зменшуємо кнопку для мобільних */
+        width: 44px;
+        height: 44px;
+        font-size: 22px;
+        
+        /* Враховуємо "безпечні зони" (Safe Areas) на сучасних iPhone без кнопок,
+           щоб кнопка не з'їхала за заокруглення екрана */
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+        left: calc(env(safe-area-inset-left, 0px) + 15px);
+    }
+}
+
+/* =========================================
+   АДАПТИВНІСТЬ ДЛЯ ПЛАНШЕТІВ ТА МОБІЛЬНИХ
+========================================= */
+@media (max-width: 768px) {
+    .welcome-content {
+        padding: 25px;
+    }
+    
+    .welcome-title {
+        font-size: 1.8rem;
+    }
+    
+    .welcome-body {
+        font-size: 1rem;
+    }
+    
+    .info-circle-btn {
+        /* На мобільному можна трохи посунути або залишити під зумом */
+        top: 80px; 
+    }
+}
+
+/* Робимо скроллбар більш помітним та темним */
+::-webkit-scrollbar {
+    width: 8px;
+    background-color: transparent; 
+}
+
+/* Сам "бігунок" скролу - тепер темніший і чіткіший */
+::-webkit-scrollbar-thumb {
+    /* Використовуємо темний сірий колір з хорошою прозорістю */
+    background-color: rgba(0, 0, 0, 0.5); 
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.1); /* Легка світла рамка для виділення */
+    background-clip: padding-box;
+}
+
+/* Ефект при наведенні - зробимо його ще трохи темнішим для кращого відгуку */
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.7); 
 }

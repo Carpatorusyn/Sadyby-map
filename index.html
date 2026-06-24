@@ -11,18 +11,74 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="style_updated.css">
 </head>
-<body>
-    <div id="search-container">
-        <input type="text" id="search-input" placeholder="Пошук садиби...">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
 
-        <span id="search-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-        </span>
-        <ul id="search-results" class="hidden"></ul>
+<body>
+    <button id="info-return-btn" class="info-circle-btn" title="Про проєкт">?</button>
+
+<div id="welcome-screen" class="welcome-overlay">
+    <div class="welcome-content">
+        <h1 class="welcome-title">Дворянські маєтки Лівобережної України</h1>
+        
+        <div class="welcome-body">
+    <p>Вітаємо на інтерактивній карті історичної спадщини. Цей проєкт створений для фіксації, дослідження та популяризації унікальних архітектурних пам'яток нашої історії. Тут ви можете дізнатися про садиби на сучасній та історичній картах, шукати інформацію про конкретні маєтки та дізнаватися більше про їхню історію.</p>
+
+    <h4 style="margin-top: 20px; margin-bottom: 10px;">Важлива інформація:</h4>
+    <ul style="padding-left: 20px; margin-bottom: 15px;">
+        <li><strong>Точність локацій:</strong> Координати є приблизними. Оскільки багато об'єктів втрачені або знаходяться на приватних територіях, маркери позначають населений пункт, у якому розташовувався маєток.</li>
+        <li><strong>Історичний контекст:</strong> Шар "Історична карта" призначений для візуального розуміння розташування садиб у межах тогочасних губерній.</li>
+        <li><strong>Продуктивність:</strong> Будьте уважні при використанні шару "Показувати назви" — це може навантажити систему на деяких пристроях.</li>
+    </ul>
+
+    <h4 style="margin-top: 20px; margin-bottom: 10px;">Зворотний зв'язок:</h4>
+    <p>Ми прагнемо зробити цей проєкт максимально точним. Якщо ви помітили історичні неточності або технічні помилки, будь ласка, повідомте нас через форму зворотного зв'язку. Ваша допомога неоціненна!</p>
+</div>
+
+        <button id="start-map-btn" class="welcome-btn">Перейти до карти</button>
+
+        <div class="welcome-footer">
+            <div class="welcome-footer">
+    <p><strong>Розробка та дизайн:</strong> Carpatorusyn</p>
+    <p><strong>Історичні дослідження та тексти:</strong> Будзар Марина</p>
+    <p><strong>Замовник проєкту:</strong> Cowo guru - середовище мислення та дієвості. </p>
     </div>
+            <div class="welcome-footer">
+    <div class="welcome-credits" style="margin-top: 15px; font-size: 0.8rem; color: #777;">
+        <p><strong>Використані матеріали:</strong></p>
+        <ul>
+            <li>Історична карта: з фондів Вікісховища (суспільне надбання).</li>
+            <li>Фонове зображення: картина Сергія Васильківського (суспільне надбання).</li>
+            <li>Шрифти: Cormorant Infant, Cormorant Unicase та Nunito (відкриті ліцензії SIL OFL).</li>
+        </ul>
+    </div>
+</div>
+            <p class="contacts-title"><strong>Зворотний зв'язок та посилання:</strong></p>
+        <p>🛠 <strong>Технічні питання (робота сайту):</strong> <a href="mailto:carpatorusyn@gmail.com">carpatorusyn@gmail.com</a></p>
+        <p>📜 <strong>Історична довідка та уточнення:</strong> <a href="mailto:m.budzar@kubg.edu.ua">m.budzar@kubg.edu.ua</a></p>
+        <p>🌐 <strong>Організація-замовник:</strong> <a href="https://cowoguru.odoo.com/" target="_blank" rel="noopener noreferrer">Cowo.guru (перейти на сайт)</a></p>
+        </div>
+    </div>
+</div>
+    <div id="search-container">
+    <input type="text" id="search-input" placeholder="Пошук садиби...">
+    <span id="search-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+    </span>
+    <ul id="search-results" class="hidden"></ul>
+</div>
+
+    <span id="search-icon-clear" class="search-inside-icon hidden" onclick="clearSearchField()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    </span>
+
+    <ul id="search-results" class="hidden"></ul>
+</div>
 
     <!-- Нова кастомна кнопка для шарів (буде видима на мобільних) -->
     <button id="custom-layers-btn" title="Керування шарами">

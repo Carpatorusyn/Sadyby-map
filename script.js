@@ -804,7 +804,7 @@ function flyToMarker(latlng, isPanelAlreadyOpen) {
     // Використовуємо flyTo замість setView для ідеальної плавності
     map.flyTo(latlng, targetZoom, {
         animate: true,
-        duration: 1.5,      // Тривалість польоту в секундах (1.5 — золота середина)
+        duration: 0.5,      // Тривалість польоту в секундах (1.5 — золота середина)
         easeLinearity: 0.25 // Плавність розгону та гальмування камери
     });
 }
@@ -814,7 +814,7 @@ function resetMapView() {
     if (previousViewState) {
         map.setView(previousViewState.center, previousViewState.zoom, {
             animate: true,
-            duration: 1.2
+            duration: 0.5
         });
         previousViewState = null; // Очищаємо пам'ять
     }
@@ -825,19 +825,17 @@ function resetMapView() {
 // ==========================================
 // Звичайна іконка з пантеоном
 const estateIcon = L.divIcon({
-    className: 'emoji-estate-marker',
-    html: '🏛️',
+    className: '', // Важливо залишити порожнім, щоб уникнути конфліктів!
+    html: '<div class="emoji-estate-marker">🏛️</div>', // Ваш клас тепер всередині
     iconSize: [36, 36],
-    iconAnchor: [18, 18], 
-    popupAnchor: [0, -20]
+    iconAnchor: [18, 18]
 });
 
 // Активна іконка з пантеоном (додається клас active для червоної рамки)
 const selectedEstateIcon = L.divIcon({
-    className: 'emoji-estate-marker active', 
-    html: '🏛️',
-    iconSize: [36, 36], 
-    iconAnchor: [18, 18], 
+    className: '', // Так само залишаємо порожнім
+    html: '<div class="emoji-estate-marker active">🏛️</div>', // Додаємо слово "active" через пробіл
+    iconSize: [36, 36],
     popupAnchor: [0, -20]
 });
 
@@ -868,7 +866,7 @@ L.geoJSON(estatesGeoJSON, {
 
             // Стандартна логіка: на мобільному відкриваємо попап, на ПК - бічну панель
             if (window.innerWidth <= 1024) {
-                map.flyTo(latlng, map.getZoom(), { duration: 1.5 });
+                map.flyTo(latlng, map.getZoom(), { duration: 0.5 });
 
                 const popupContent = document.createElement('div');
                 popupContent.className = 'custom-estate-popup';
@@ -955,7 +953,7 @@ searchInput.addEventListener('input', function(e) {
             selectedMarker = item.marker;
 
             if (window.innerWidth <= 1024) {
-                map.flyTo(item.latlng, map.getZoom(), { duration: 1.5 });
+                map.flyTo(item.latlng, map.getZoom(), { duration: 0.5 });
 
                 const popupContent = document.createElement('div');
                 popupContent.className = 'custom-estate-popup';
@@ -1108,3 +1106,65 @@ map.on('moveend', function() {
         m.style.pointerEvents = 'auto'; // Повертаємо можливість клікати
     });
 });
+
+// ==========================================
+// БЕЗПЕЧНИЙ ПОШУК (ЛУПА / ХРЕСТИК)
+// ==========================================
+const mySearchIcon = document.getElementById('search-icon');
+const mySearchInput = document.getElementById('search-input');
+const mySearchResults = document.getElementById('search-results');
+
+const svgMagnifier = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>`;
+const svgCross = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+
+// Перевіряємо, чи існують елементи, щоб не зламати інші скрипти
+if (mySearchInput && mySearchIcon) {
+    
+    // Міняємо іконку при введенні
+    mySearchInput.addEventListener('input', function() {
+        if (this.value.trim().length > 0) {
+            mySearchIcon.innerHTML = svgCross;
+        } else {
+            mySearchIcon.innerHTML = svgMagnifier;
+        }
+    });
+
+    // Очищаємо при кліку (звичайний click, який працює скрізь)
+    mySearchIcon.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        if (mySearchInput.value.length > 0) {
+            mySearchInput.value = ''; 
+            mySearchIcon.innerHTML = svgMagnifier; 
+            
+            // Ховаємо список результатів
+            if (mySearchResults) {
+                mySearchResults.innerHTML = '';
+                mySearchResults.classList.add('hidden');
+            }
+            
+            mySearchInput.focus();
+        }
+    });
+}
+
+// ==========================================
+// ЛОГІКА СТАРТОВОГО ЕКРАНА (WELCOME SCREEN)
+// ==========================================
+const welcomeScreen = document.getElementById('welcome-screen');
+const startMapBtn = document.getElementById('start-map-btn');
+const infoReturnBtn = document.getElementById('info-return-btn');
+
+// Закриття екрана при кліку на "Перейти до карти"
+if (startMapBtn && welcomeScreen) {
+    startMapBtn.addEventListener('click', function() {
+        welcomeScreen.classList.add('hidden');
+    });
+}
+
+// Повернення екрана при кліку на круглу кнопку "i"
+if (infoReturnBtn && welcomeScreen) {
+    infoReturnBtn.addEventListener('click', function() {
+        welcomeScreen.classList.remove('hidden');
+    });
+}
